@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.2 — `--ignore` & `--version` fixes
 
 ### Fixed
 - **`--ignore` now applies to TS/JS source files.** Previously it only excluded
