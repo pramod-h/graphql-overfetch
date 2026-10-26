@@ -9,7 +9,11 @@ import {
   extractGraphqlFiles,
   extractTaggedTemplates,
 } from '../parsers/graphql-files';
-import { mapComponents, collectReferencedNames } from '../analyzers/component-map';
+import {
+  mapComponents,
+  collectReferencedNames,
+  collectCacheKeyFields,
+} from '../analyzers/component-map';
 import { runAnalysis } from '../analyzers';
 import { analyzeGeneratedTypes } from '../analyzers/generated-types';
 import { spinner } from '../utils/logger';
@@ -74,6 +78,7 @@ export function scan(options: ScanOptions): ScanResult {
     usages,
     bindings,
     referencedNames,
+    cacheKeyFields: collectCacheKeyFields(tsProject),
     schema,
     stats: {
       graphqlFiles: fileDefs.length,

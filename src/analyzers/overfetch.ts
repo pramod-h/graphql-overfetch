@@ -6,7 +6,10 @@ import {
   OverfetchFinding,
 } from '../types';
 import { DocBinding } from '../parsers/graphql-files';
-import { buildResolvers } from './component-map';
+import { buildResolvers, isNoCacheUsage } from './component-map';
+
+/** Always needed by normalized caches; Apollo adds `__typename` on its own. */
+const DEFAULT_CACHE_KEYS = ['id', 'uid', '_id'];
 
 /** True if `leaf` is covered by any pass-through (whole-object) ancestor. */
 function passthroughCovers(leaf: string, passthrough: Set<string>): boolean {
@@ -41,8 +44,10 @@ export function analyzeOverfetch(
   operations: GraphQLOperation[],
   fragments: GraphQLFragment[],
   usages: HookUsage[],
-  bindings: DocBinding[]
+  bindings: DocBinding[],
+  cacheKeyFields: Set<string> = new Set()
 ): OverfetchFinding[] {
+  const cacheKeys = new Set([...DEFAULT_CACHE_KEYS, ...cacheKeyFields]);
   const { resolveOp } = buildResolvers(operations, fragments, bindings);
 
   // Group usages by the operation they resolve to.
@@ -89,10 +94,17 @@ export function analyzeOverfetch(
     }
     if (accessed.size === 0 && passthrough.size === 0) continue; // not analyzable
 
-    const leaves = op.leafPaths;
+    // Cache identity fields aren't overfetch: the cache needs them even when no
+    // component reads them. Without a cache (graphql-request, codegen fetchers)
+    // an unread id is real waste, so only `__typename` is skipped there.
+    const usesCache = !opUsages.every(isNoCacheUsage);
+    const leaves = op.leafPaths.filter((l) => {
+      const last = l.slice(l.lastIndexOf('.') + 1);
+      return last !== '__typename' && !(usesCache && cacheKeys.has(last));
+    });
     if (leaves.length === 0) continue;
 
-    const topLevel = Array.from(new Set(op.fields.map((f) => f.responseKey)));
+    const topLevel = Array.from(new Set(leaves.map((l) => l.split('.')[0])));
     const unused: { path: string; confidence: Confidence }[] = [];
     let unusedLeafCount = 0;
     const reportedBranches = new Set<string>();

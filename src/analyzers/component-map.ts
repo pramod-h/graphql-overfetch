@@ -664,6 +664,28 @@ export function collectReferencedNames(project: Project): Set<string> {
   return names;
 }
 
+/**
+ * Field names the app's Apollo cache keys objects by: string entries of any
+ * `keyFields: [...]` (typePolicies). Reported as unused, they'd break caching.
+ */
+export function collectCacheKeyFields(project: Project): Set<string> {
+  const keys = new Set<string>();
+  for (const sf of project.getSourceFiles()) {
+    for (const pa of sf.getDescendantsOfKind(SyntaxKind.PropertyAssignment)) {
+      if (pa.getName() !== 'keyFields') continue;
+      const init = pa.getInitializer();
+      if (!init || !Node.isArrayLiteralExpression(init)) continue;
+      for (const s of init.getDescendantsOfKind(SyntaxKind.StringLiteral)) keys.add(s.getLiteralText());
+    }
+  }
+  return keys;
+}
+
+/** True when the call site uses a client without a normalized cache. */
+export function isNoCacheUsage(u: HookUsage): boolean {
+  return u.library === 'graphql-request' || u.hook.endsWith('.fetcher');
+}
+
 /** Build the operation/fragment → component usage map for the whole project. */
 export function mapComponents(
   project: Project,

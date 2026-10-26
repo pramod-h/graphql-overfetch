@@ -22,13 +22,15 @@ export interface AnalyzeInput {
   bindings: DocBinding[];
   /** Identifiers referenced as values anywhere in the project (for dead-query detection). */
   referencedNames: Set<string>;
+  /** Field names the app's cache keys objects by (`typePolicies` `keyFields`). */
+  cacheKeyFields?: Set<string>;
   schema: GraphQLSchema | null;
   stats: AnalysisResult['stats'];
 }
 
 /** Run every analyzer and assemble the full result. */
 export function runAnalysis(input: AnalyzeInput): AnalysisResult {
-  const { project, operations, fragments, usages, bindings, referencedNames, schema, stats } =
+  const { project, operations, fragments, usages, bindings, referencedNames, schema, stats, cacheKeyFields } =
     input;
   return {
     project,
@@ -40,7 +42,7 @@ export function runAnalysis(input: AnalyzeInput): AnalysisResult {
     duplicateQueries: findDuplicates(operations),
     duplicateFragments: findDuplicates(fragments),
     complexity: analyzeComplexity(operations),
-    overfetch: analyzeOverfetch(operations, fragments, usages, bindings),
+    overfetch: analyzeOverfetch(operations, fragments, usages, bindings, cacheKeyFields),
     schemaDrift: analyzeSchemaDrift(schema, operations, fragments),
     schemaLoaded: !!schema,
     generatedTypes: null,

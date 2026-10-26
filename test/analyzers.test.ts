@@ -7,7 +7,7 @@ import { Project } from 'ts-morph';
 import { buildSchema } from 'graphql';
 import { extractTaggedTemplates } from '../src/parsers/graphql-files';
 import { buildModel } from '../src/parsers/operations';
-import { mapComponents, collectReferencedNames } from '../src/analyzers/component-map';
+import { mapComponents, collectReferencedNames, collectCacheKeyFields } from '../src/analyzers/component-map';
 import { analyzeOverfetch } from '../src/analyzers/overfetch';
 import { findDeadQueries } from '../src/analyzers/dead-queries';
 import { findDuplicates } from '../src/analyzers/duplicates';
@@ -75,7 +75,7 @@ describe('overfetch analyzer', () => {
     const user = findings.find((f) => f.operation === 'GetUser');
     expect(user).toBeTruthy();
     const unusedPaths = user!.unused.map((u) => u.path);
-    expect(unusedPaths).toContain('user.id');
+    expect(unusedPaths).not.toContain('user.id'); // cache key, needed by Apollo
     expect(unusedPaths).toContain('user.email');
     expect(unusedPaths).toContain('user.avatar.url');
     expect(unusedPaths).not.toContain('user.name');
@@ -119,7 +119,7 @@ describe('overfetch analyzer', () => {
     const f = findings.find((x) => x.operation === 'List');
     expect(f).toBeTruthy();
     const paths = f!.unused.map((u) => u.path);
-    expect(paths).toContain('posts.id');
+    expect(paths).not.toContain('posts.id'); // cache key, not overfetch
     expect(paths).toContain('posts.body');
     expect(paths).toContain('posts.author.name');
     expect(paths).not.toContain('posts.title'); // read inside the map callback
@@ -312,7 +312,7 @@ describe('urql', () => {
     );
     expect(f).toBeTruthy();
     const paths = f!.unused.map((u) => u.path);
-    expect(paths).toContain('user.id');
+    expect(paths).not.toContain('user.id'); // cache key, not overfetch
     expect(paths).toContain('user.email');
     expect(paths).not.toContain('user.name');
     expect(findDeadQueries(operations, referencedNames).map((o) => o.name)).not.toContain(
@@ -385,7 +385,7 @@ describe('Apollo Client imperative API', () => {
     );
     expect(f).toBeTruthy();
     const paths = f!.unused.map((u) => u.path);
-    expect(paths).toContain('user.id');
+    expect(paths).not.toContain('user.id'); // cache key, not overfetch
     expect(paths).toContain('user.email');
     expect(paths).not.toContain('user.name');
   });
@@ -437,7 +437,7 @@ describe('relay', () => {
     );
     expect(f).toBeTruthy();
     const paths = f!.unused.map((u) => u.path);
-    expect(paths).toContain('viewer.id');
+    expect(paths).not.toContain('viewer.id'); // cache key, not overfetch
     expect(paths).toContain('viewer.email');
     expect(paths).not.toContain('viewer.name');
     expect(findDeadQueries(operations, referencedNames).map((o) => o.name)).not.toContain(
@@ -670,5 +670,50 @@ describe('discarded results', () => {
     expect(findings.find((x) => x.operation === 'SetAddress')).toBeFalsy();
     // Apollo's client.query result can be read later from the cache
     expect(findings.find((x) => x.operation === 'GetCart')).toBeFalsy();
+  });
+});
+
+describe('cache identity fields', () => {
+  const DOCS = `
+    import { gql } from '@apollo/client';
+    export const STORE = gql\`query Store { __typename storeConfig { __typename store_code name locale } }\`;
+  `;
+  const COMPONENT = `
+    import { useQuery } from '@apollo/client';
+    import { STORE } from './q';
+    export function Name() { const { data } = useQuery(STORE); return data?.storeConfig?.name; }
+  `;
+
+  it('skips __typename and typePolicies keyFields for Apollo', () => {
+    const { operations, fragments, usages, bindings } = analyze({ 'q.ts': DOCS, 'Name.tsx': COMPONENT });
+    const findings = analyzeOverfetch(operations, fragments, usages, bindings, new Set(['store_code']));
+    const paths = findings.find((f) => f.operation === 'Store')!.unused.map((u) => u.path);
+    expect(paths).toEqual(['storeConfig.locale']);
+  });
+
+  it('collects keyFields from typePolicies', () => {
+    const project = new Project({ useInMemoryFileSystem: true });
+    project.createSourceFile(
+      'cache.ts',
+      `export const typePolicies = { StoreConfig: { keyFields: ['store_code'] }, Cart: { keyFields: [] } };`
+    );
+    expect([...collectCacheKeyFields(project)]).toEqual(['store_code']);
+  });
+
+  it('still reports an unread id when no client cache is involved', () => {
+    const { operations, fragments, usages, bindings } = analyze({
+      'q.ts': `
+        import { gql } from 'graphql-tag';
+        export const ACCOUNT = gql\`query Account { account { id firstname } }\`;
+      `,
+      'gateway.ts': `
+        import { useAccountQuery } from './generated';
+        export async function load() { const { account } = await useAccountQuery.fetcher()(); return account.firstname; }
+      `,
+    });
+    const paths = analyzeOverfetch(operations, fragments, usages, bindings)
+      .find((f) => f.operation === 'Account')!
+      .unused.map((u) => u.path);
+    expect(paths).toEqual(['account.id']);
   });
 });
