@@ -57,9 +57,29 @@ export function analyzeOverfetch(
   const findings: OverfetchFinding[] = [];
 
   for (const op of operations) {
-    if (op.operation !== 'query') continue; // queries only — mutations rarely render their result
-    const opUsages = byOp.get(op) ?? [];
-    if (opUsages.length === 0) continue; // no consumer → dead-query territory, not overfetch
+    const allUsages = byOp.get(op) ?? [];
+    if (allUsages.length === 0) continue; // no consumer → dead-query territory, not overfetch
+
+    // Every call site throws the result away → the whole selection is wasted,
+    // for mutations too (see HookUsage.resultDiscarded).
+    if (allUsages.every((u) => u.resultDiscarded)) {
+      const leaves = op.leafPaths;
+      if (!leaves.length) continue;
+      findings.push({
+        operation: op.name ?? op.varName ?? `(anonymous ${op.operation})`,
+        file: op.loc.file,
+        line: op.loc.line,
+        requestedCount: leaves.length,
+        usedCount: 0,
+        unused: leaves.map((path) => ({ path, confidence: 'high' as Confidence })).sort((a, b) => a.path.localeCompare(b.path)),
+        estimatedReductionPct: 100,
+        reason: 'result-discarded',
+      });
+      continue;
+    }
+
+    if (op.operation !== 'query') continue; // otherwise queries only — mutations rarely render their result
+    const opUsages = allUsages.filter((u) => !u.resultDiscarded);
 
     const accessed = new Set<string>();
     const passthrough = new Set<string>();

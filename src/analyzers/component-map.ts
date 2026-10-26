@@ -34,6 +34,9 @@ const APOLLO_CLIENT_METHOD_KEYS: Record<string, 'query' | 'mutation'> = {
   mutate: 'mutation',
 };
 
+/** Clients without a normalized cache: a discarded result really is wasted. */
+const NO_CACHE_LIBRARIES = new Set<Library>(['graphql-request', 'codegen']);
+
 const GENERATED_HOOK_RE = /^use([A-Z]\w*?)(LazyQuery|SuspenseQuery|Query|Mutation|Subscription)$/;
 
 /** Iteration methods whose callback's element param aliases a list element. */
@@ -693,6 +696,7 @@ export function mapComponents(
       const accessed = new Set<string>();
       const passthrough = new Set<string>();
       const queue = resultAliases(call, library, hook, scope, direct);
+      const hasResultAliases = queue.length > 0;
       const guard = new Set<string>();
       while (queue.length) {
         const a = queue.shift()!;
@@ -701,6 +705,18 @@ export function mapComponents(
         guard.add(key);
         collectAccesses(a, accessed, passthrough, queue);
       }
+
+      // `await request(...);` — the selection is fetched and dropped. Only for
+      // clients without a normalized cache: with Apollo/urql/Relay a discarded
+      // mutation result still updates the cache, so selecting fields can be deliberate.
+      const holderParent = resultHolder(call).getParent();
+      const resultDiscarded =
+        NO_CACHE_LIBRARIES.has(library) &&
+        !!holderParent &&
+        (Node.isExpressionStatement(holderParent) || Node.isVoidExpression(holderParent)) &&
+        !hasResultAliases &&
+        accessed.size === 0 &&
+        passthrough.size === 0;
 
       usages.push({
         hook,
@@ -712,6 +728,7 @@ export function mapComponents(
         line: call.getStartLineNumber(),
         accessedPaths: Array.from(accessed),
         passthroughPaths: Array.from(passthrough),
+        ...(resultDiscarded ? { resultDiscarded } : {}),
       });
     }
   }

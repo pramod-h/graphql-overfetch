@@ -621,3 +621,54 @@ describe('direct-result fetchers', () => {
     expect(account.unused.map((u) => u.path)).not.toContain('account.firstname');
   });
 });
+
+describe('discarded results', () => {
+  const DOCS = `
+    import { gql } from 'graphql-tag';
+    export const SET_ADDRESS = gql\`mutation SetAddress { setAddress { cart { id total items { sku } } } }\`;
+    export const GET_CART = gql\`query GetCart { cart { id total } }\`;
+  `;
+
+  it('reports a no-cache mutation whose result every call site throws away', () => {
+    const { operations, fragments, usages, bindings } = analyze({
+      'q.ts': DOCS,
+      'gateway.ts': `
+        import { useSetAddressMutation } from './generated';
+        export async function setAddress() {
+          await useSetAddressMutation.fetcher({})();
+        }
+      `,
+    });
+    const f = analyzeOverfetch(operations, fragments, usages, bindings).find(
+      (x) => x.operation === 'SetAddress'
+    )!;
+    expect(f.reason).toBe('result-discarded');
+    expect(f.usedCount).toBe(0);
+    expect(f.unused).toHaveLength(3);
+  });
+
+  it('does not report it when any call site reads the result, or for Apollo', () => {
+    const { operations, fragments, usages, bindings } = analyze({
+      'q.ts': DOCS,
+      'a.ts': `
+        import { request } from 'graphql-request';
+        import { useSetAddressMutation } from './generated';
+        import { GET_CART } from './q';
+        export async function one() { await useSetAddressMutation.fetcher({})(); }
+        export async function two() {
+          const { setAddress } = await useSetAddressMutation.fetcher({})();
+          return setAddress;
+        }
+      `,
+      'b.tsx': `
+        import { useApolloClient } from '@apollo/client';
+        import { GET_CART } from './q';
+        export function Prefetch() { const client = useApolloClient(); client.query({ query: GET_CART }); return null; }
+      `,
+    });
+    const findings = analyzeOverfetch(operations, fragments, usages, bindings);
+    expect(findings.find((x) => x.operation === 'SetAddress')).toBeFalsy();
+    // Apollo's client.query result can be read later from the cache
+    expect(findings.find((x) => x.operation === 'GetCart')).toBeFalsy();
+  });
+});

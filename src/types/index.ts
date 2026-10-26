@@ -89,6 +89,11 @@ export interface HookUsage {
   accessedPaths: string[];
   /** Subtrees handed off wholesale (JSX prop, fn arg, spread) — treated as fully used. */
   passthroughPaths: string[];
+  /**
+   * The call's result is thrown away (`await request(...);`) by a client with no
+   * normalized cache, so nothing can ever read the selected fields.
+   */
+  resultDiscarded?: boolean;
 }
 
 export type Confidence = 'high' | 'medium' | 'low';
@@ -102,6 +107,8 @@ export interface OverfetchFinding {
   unused: { path: string; confidence: Confidence }[];
   /** Rough payload-reduction estimate = unusedLeafs / requestedLeafs. */
   estimatedReductionPct: number;
+  /** Set when every call site throws the result away. */
+  reason?: 'result-discarded';
 }
 
 export interface DuplicateGroup {

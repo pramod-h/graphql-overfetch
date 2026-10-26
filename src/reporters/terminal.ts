@@ -64,9 +64,11 @@ export function printOverfetch(a: AnalysisResult): void {
       `\n${c.bold(f.operation)}  ${c.dim(rel(a.project.root, f.file) + ':' + f.line)}`
     );
     line(
-      `  requested ${c.bold(String(f.requestedCount))} · used ${c.bold(
-        String(f.usedCount)
-      )} · ${c.red('~' + f.estimatedReductionPct + '% payload reduction')}`
+      f.reason === 'result-discarded'
+        ? `  requested ${c.bold(String(f.requestedCount))} · ${c.red('result never used: every call site discards it')}`
+        : `  requested ${c.bold(String(f.requestedCount))} · used ${c.bold(
+            String(f.usedCount)
+          )} · ${c.red('~' + f.estimatedReductionPct + '% payload reduction')}`
     );
     for (const u of f.unused.slice(0, 20)) {
       const tag = confColor[u.confidence](`[${u.confidence}]`);
