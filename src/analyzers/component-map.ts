@@ -457,6 +457,7 @@ const WHOLE_OBJECT_PARENTS = new Set([
   SyntaxKind.ReturnStatement,
   SyntaxKind.ArrayLiteralExpression,
   SyntaxKind.PropertyAssignment,
+  SyntaxKind.ShorthandPropertyAssignment, // return { selectedPaymentMethod }
   SyntaxKind.JsxSpreadAttribute,
 ]);
 

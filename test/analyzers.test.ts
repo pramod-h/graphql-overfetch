@@ -717,3 +717,25 @@ describe('cache identity fields', () => {
     expect(paths).toEqual(['account.id']);
   });
 });
+
+describe('shorthand pass-through', () => {
+  it('treats a subtree returned as { x } as handed off whole', () => {
+    const { operations, fragments, usages, bindings } = analyze({
+      'q.ts': `
+        import { gql } from '@apollo/client';
+        export const SUMMARY = gql\`query Summary { cart { id selected_payment_method { code title } } }\`;
+      `,
+      'useSummary.ts': `
+        import { useQuery } from '@apollo/client';
+        import { SUMMARY } from './q';
+        export const useSummary = () => {
+          const { data, loading } = useQuery(SUMMARY);
+          const selectedPaymentMethod = data ? data.cart.selected_payment_method : null;
+          return { isLoading: loading, selectedPaymentMethod };
+        };
+      `,
+    });
+    const findings = analyzeOverfetch(operations, fragments, usages, bindings);
+    expect(findings.find((f) => f.operation === 'Summary')).toBeFalsy();
+  });
+});
