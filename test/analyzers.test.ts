@@ -542,3 +542,82 @@ export function C() {
     }
   }, 30000);
 });
+
+describe('direct-result fetchers', () => {
+  const MENU = `
+    import { gql } from 'graphql-tag';
+    export const MENU = gql\`query Menu { categoryTree { name position children { name url_key } } }\`;
+    export const ACCOUNT = gql\`query Account { account { id firstname email } }\`;
+  `;
+
+  it('traces codegen static fetchers: useFooQuery.fetcher(vars)()', () => {
+    const { operations, fragments, usages, bindings } = analyze({
+      'q.ts': MENU,
+      'gateway.ts': `
+        import { useMenuQuery, useAccountQuery } from './generated';
+        export async function loadMenu() {
+          const data = await useMenuQuery.fetcher()();
+          return data.categoryTree?.children?.map((c) => c.name);
+        }
+        export async function loadAccount() {
+          const { account } = await useAccountQuery.fetcher({})();
+          return account?.firstname;
+        }
+      `,
+    });
+    const menuUsage = usages.find((u) => u.hook === 'useMenuQuery.fetcher');
+    expect(menuUsage?.library).toBe('codegen');
+    const findings = analyzeOverfetch(operations, fragments, usages, bindings);
+    const menu = findings.find((f) => f.operation === 'Menu')!;
+    expect(menu.unused.map((u) => u.path)).toEqual(
+      expect.arrayContaining(['categoryTree.name', 'categoryTree.position', 'categoryTree.children.url_key'])
+    );
+    expect(menu.unused.map((u) => u.path)).not.toContain('categoryTree.children.name');
+    const account = findings.find((f) => f.operation === 'Account')!;
+    expect(account.unused.map((u) => u.path)).toContain('account.email');
+    expect(account.unused.map((u) => u.path)).not.toContain('account.firstname');
+  });
+
+  it('treats graphql-request results as the data, incl. client.request(DOC)', () => {
+    const { operations, fragments, usages, bindings } = analyze({
+      'q.ts': MENU,
+      'api.ts': `
+        import { request, GraphQLClient } from 'graphql-request';
+        import { MENU, ACCOUNT } from './q';
+        const client = new GraphQLClient('/graphql');
+        export async function a() {
+          const res = await client.request(ACCOUNT);
+          return res.account.email;
+        }
+        export function b() {
+          return request('/graphql', MENU).then((data) => data.categoryTree.name);
+        }
+      `,
+    });
+    const findings = analyzeOverfetch(operations, fragments, usages, bindings);
+    const account = findings.find((f) => f.operation === 'Account')!;
+    expect(account.unused.map((u) => u.path)).toContain('account.firstname');
+    expect(account.unused.map((u) => u.path)).not.toContain('account.email');
+    const menu = findings.find((f) => f.operation === 'Menu')!;
+    expect(menu.unused.map((u) => u.path)).not.toContain('categoryTree.name');
+  });
+
+  it('follows reads straight off the call and ignores unrelated outer variables', () => {
+    const { operations, fragments, usages, bindings } = analyze({
+      'q.ts': MENU,
+      'Head.tsx': `
+        import { useQuery } from '@apollo/client';
+        import { ACCOUNT } from './q';
+        export function Head() {
+          const label = format(useQuery(ACCOUNT).data?.account?.firstname);
+          return label;
+        }
+      `,
+    });
+    const findings = analyzeOverfetch(operations, fragments, usages, bindings);
+    const account = findings.find((f) => f.operation === 'Account')!;
+    // firstname is read (and handed to format), email never is
+    expect(account.unused.map((u) => u.path)).toContain('account.email');
+    expect(account.unused.map((u) => u.path)).not.toContain('account.firstname');
+  });
+});

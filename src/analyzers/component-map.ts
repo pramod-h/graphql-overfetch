@@ -34,6 +34,8 @@ const APOLLO_CLIENT_METHOD_KEYS: Record<string, 'query' | 'mutation'> = {
   mutate: 'mutation',
 };
 
+const GENERATED_HOOK_RE = /^use([A-Z]\w*?)(LazyQuery|SuspenseQuery|Query|Mutation|Subscription)$/;
+
 /** Iteration methods whose callback's element param aliases a list element. */
 const CB_ELEMENT_METHODS = new Set([
   'map',
@@ -60,6 +62,8 @@ const RESULT_CALLBACKS = new Set(['onCompleted', 'onData']);
 
 interface Alias {
   ident: string;
+  /** Start the walk from this node instead of searching for `ident` (e.g. `useQuery(D).data`). */
+  node?: Node;
   /** Response-key path this identifier is rooted at ('' = operation root). */
   base: string;
   /** Scope to search for references (defaults to the enclosing function). */
@@ -121,15 +125,37 @@ export function buildResolvers(
   return { resolveOp, resolveFrag, opByName };
 }
 
+interface Classified {
+  library: Library;
+  hook: string;
+  docArg: Node | null;
+  generatedName: string | null;
+  /** The call resolves to the data itself, not a `{ data }` result object. */
+  direct?: boolean;
+}
+
 /** Classify a call as a GraphQL execution and return its library + doc argument. */
-function classifyCall(
-  call: CallExpression
-): { library: Library; hook: string; docArg: Node | null; generatedName: string | null } | null {
+function classifyCall(call: CallExpression): Classified | null {
   const callee = call.getExpression();
+  const args = call.getArguments();
+
+  // GraphQL Code Generator's typescript-react-query static fetcher runs the
+  // document outside React: `useFooQuery.fetcher(variables)()` resolves to the data.
+  if (Node.isCallExpression(callee)) {
+    const inner = callee.getExpression();
+    if (Node.isPropertyAccessExpression(inner) && inner.getName() === 'fetcher') {
+      const hookName = inner.getExpression().getText();
+      const gen = GENERATED_HOOK_RE.exec(hookName);
+      if (gen) {
+        return { library: 'codegen', hook: `${hookName}.fetcher`, docArg: null, generatedName: gen[1], direct: true };
+      }
+    }
+    return null;
+  }
+
   const hook = Node.isPropertyAccessExpression(callee)
     ? callee.getName()
     : callee.getText();
-  const args = call.getArguments();
 
   // Apollo Client's imperative API: client.query({ query: DOC }) / client.mutate({ mutation: DOC }).
   const clientOptKey = APOLLO_CLIENT_METHOD_KEYS[hook];
@@ -175,8 +201,9 @@ function classifyCall(
     return { library: 'relay', hook, docArg: args[0] ?? null, generatedName: null };
   }
   if (REQUEST_FNS.has(hook)) {
-    // graphql-request: request(url, DOC, variables)
-    return { library: 'graphql-request', hook, docArg: args[1] ?? null, generatedName: null };
+    // graphql-request resolves to the data: request(url, DOC, vars) or client.request(DOC, vars).
+    const docArg = Node.isPropertyAccessExpression(callee) ? args[0] : args[1];
+    return { library: 'graphql-request', hook, docArg: docArg ?? null, generatedName: null, direct: true };
   }
   return null;
 }
@@ -254,11 +281,45 @@ function bindNamePattern(nameNode: Node, base: string, scope: Node, aliases: Ali
   }
 }
 
+/** The outermost node that still holds the call's result: through `await`, parens, `!` and `as`. */
+export function resultHolder(call: CallExpression): Node {
+  let holder: Node = call;
+  let parent = holder.getParent();
+  while (
+    parent &&
+    (Node.isAwaitExpression(parent) ||
+      Node.isParenthesizedExpression(parent) ||
+      Node.isNonNullExpression(parent) ||
+      Node.isAsExpression(parent))
+  ) {
+    holder = parent;
+    parent = holder.getParent();
+  }
+  return holder;
+}
+
 /** From a hook call, figure out the identifiers that hold the result data. */
-function resultAliases(call: CallExpression, library: Library, hook: string, scope: Node): Alias[] {
+function resultAliases(
+  call: CallExpression,
+  library: Library,
+  hook: string,
+  scope: Node,
+  direct = false
+): Alias[] {
   const aliases: Alias[] = [];
-  const decl = call.getFirstAncestorByKind(SyntaxKind.VariableDeclaration);
+  // Only a variable initialised with the call's result itself holds the result.
+  const holder = resultHolder(call);
+  const holderParent = holder.getParent();
+  const decl =
+    holderParent && Node.isVariableDeclaration(holderParent) && holderParent.getInitializer() === holder
+      ? holderParent
+      : undefined;
   const nameNode = decl?.getNameNode();
+
+  // Read straight off the call: useQuery(DOC).data?.page, (await fetch()).user
+  if (holderParent && Node.isPropertyAccessExpression(holderParent) && holderParent.getExpression() === holder) {
+    aliases.push({ ident: '', node: holder, base: '', scope, viaData: !direct && library !== 'relay' && hook !== 'useFragment' });
+  }
 
   const pushObjData = (objPattern: Node, altScope?: Node) => {
     if (!Node.isObjectBindingPattern(objPattern)) return;
@@ -268,7 +329,10 @@ function resultAliases(call: CallExpression, library: Library, hook: string, sco
     }
   };
 
-  if (nameNode) {
+  if (nameNode && direct) {
+    // The result IS the data: const data = await request(...) / const { user } = await ...
+    bindNamePattern(nameNode, '', scope, aliases);
+  } else if (nameNode) {
     if (Node.isObjectBindingPattern(nameNode)) {
       // Apollo: const { data } = useQuery(...)  /  const { data: { user } = {} } = ...
       pushObjData(nameNode);
@@ -320,7 +384,7 @@ function resultAliases(call: CallExpression, library: Library, hook: string, sco
   }
 
   // Promise chaining on imperative calls: client.query(opts).then(({ data }) => ...)
-  // or .then((result) => result.data...).
+  // or .then((result) => result.data...). Direct calls: request(...).then((data) => ...).
   const thenAccess = call.getParent();
   if (Node.isPropertyAccessExpression(thenAccess) && thenAccess.getName() === 'then') {
     const thenCall = thenAccess.getParent();
@@ -331,7 +395,9 @@ function resultAliases(call: CallExpression, library: Library, hook: string, sco
         if (p0) {
           const pn = p0.getNameNode();
           const body = cb.getBody();
-          if (Node.isIdentifier(pn)) {
+          if (direct) {
+            bindNamePattern(pn, '', body, aliases);
+          } else if (Node.isIdentifier(pn)) {
             aliases.push({ ident: pn.getText(), base: '', scope: body, viaData: true });
           } else if (Node.isObjectBindingPattern(pn)) {
             pushObjData(pn, body);
@@ -403,9 +469,11 @@ function collectAccesses(
   passthrough: Set<string>,
   queue: Alias[]
 ): void {
-  const refs = alias.scope
-    .getDescendantsOfKind(SyntaxKind.Identifier)
-    .filter((id) => id.getText() === alias.ident);
+  const refs: Node[] = alias.node
+    ? [alias.node]
+    : alias.scope
+        .getDescendantsOfKind(SyntaxKind.Identifier)
+        .filter((id) => id.getText() === alias.ident);
 
   for (const ref of refs) {
     // Skip the declaration site itself.
@@ -536,8 +604,6 @@ function collectAccesses(
   }
 }
 
-const GENERATED_HOOK_RE = /^use([A-Z]\w*?)(LazyQuery|SuspenseQuery|Query|Mutation|Subscription)$/;
-
 /**
  * Every identifier referenced as a *value* across the project (call arguments,
  * object-literal values, named imports) plus generated-hook operation names.
@@ -555,7 +621,12 @@ export function collectReferencedNames(project: Project): Set<string> {
 
   for (const sf of project.getSourceFiles()) {
     for (const imp of sf.getImportDeclarations()) {
-      for (const ni of imp.getNamedImports()) add(ni.getNameNode().getText());
+      for (const ni of imp.getNamedImports()) {
+        const name = ni.getNameNode().getText();
+        add(name);
+        const gen = GENERATED_HOOK_RE.exec(name);
+        if (gen) add(gen[1]); // import { useGetUserQuery } → GetUser
+      }
     }
     for (const call of sf.getDescendantsOfKind(SyntaxKind.CallExpression)) {
       const callee = call.getExpression();
@@ -605,7 +676,7 @@ export function mapComponents(
     for (const call of sf.getDescendantsOfKind(SyntaxKind.CallExpression)) {
       const classified = classifyCall(call);
       if (!classified) continue;
-      const { library, hook, docArg, generatedName } = classified;
+      const { library, hook, docArg, generatedName, direct } = classified;
 
       const identifier = generatedName ?? docIdentifier(docArg) ?? inlineDocName(docArg);
       const isFragmentHook = hook === 'useFragment';
@@ -621,7 +692,7 @@ export function mapComponents(
 
       const accessed = new Set<string>();
       const passthrough = new Set<string>();
-      const queue = resultAliases(call, library, hook, scope);
+      const queue = resultAliases(call, library, hook, scope, direct);
       const guard = new Set<string>();
       while (queue.length) {
         const a = queue.shift()!;
