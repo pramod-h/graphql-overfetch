@@ -975,3 +975,29 @@ describe('duplicate detection', () => {
     expect(groups).toEqual([['GenerateToken', 'generateToken']]);
   });
 });
+
+describe('tracer: useMemo and arrow returns', () => {
+  it('follows a value through useMemo into its variable', () => {
+    const { operations, fragments, usages, bindings } = analyze({
+      'q.ts': `
+        import { gql } from '@apollo/client';
+        export const MILESTONES = gql\`query GetMilestones { getMilestones { is_enabled milestones { amount is_achieved icon_url } } }\`;
+      `,
+      'Free.tsx': `
+        import { useQuery } from '@apollo/client';
+        import { useMemo } from 'react';
+        import { MILESTONES } from './q';
+        export function Free() {
+          const { data } = useQuery(MILESTONES);
+          const milestones = useMemo(() => data?.getMilestones?.milestones || [], [data?.getMilestones?.milestones]);
+          return milestones.filter((m) => m.is_achieved).map((m) => m.amount);
+        }
+      `,
+    });
+    const f = analyzeOverfetch(operations, fragments, usages, bindings).find((x) => x.operation === 'GetMilestones')!;
+    expect(f.unused.map((u) => u.path).sort()).toEqual([
+      'getMilestones.is_enabled',
+      'getMilestones.milestones.icon_url',
+    ]);
+  });
+});

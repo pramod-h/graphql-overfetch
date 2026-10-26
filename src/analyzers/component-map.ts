@@ -682,6 +682,32 @@ function collectAccesses(
     // legitimately be '' here (the entire operation result passed on wholesale,
     // e.g. `return { storeConfig: data }`) — must not be dropped just because
     // '' is falsy.
+    // () => <chain>: an expression-bodied arrow returns the value. Inside
+    // `const x = useMemo(() => <chain>, deps)` it becomes `x`; anywhere else it
+    // leaves the scope like `return <chain>` does.
+    if (endParent && Node.isArrowFunction(endParent) && endParent.getBody() === cur) {
+      const memo = endParent.getParent();
+      const memoDecl = memo && Node.isCallExpression(memo) ? memo.getParent() : undefined;
+      const memoName =
+        memo && Node.isCallExpression(memo) && memo.getArguments()[0] === endParent
+          ? (Node.isPropertyAccessExpression(memo.getExpression())
+              ? (memo.getExpression() as any).getName()
+              : memo.getExpression().getText())
+          : null;
+      if (
+        memoName === 'useMemo' &&
+        memoDecl &&
+        Node.isVariableDeclaration(memoDecl) &&
+        memoDecl.getInitializer() === memo
+      ) {
+        bindNamePattern(memoDecl.getNameNode(), curPath, alias.scope, queue);
+      } else {
+        passthrough.add(curPath);
+      }
+      if (curPath) accessed.add(curPath);
+      continue;
+    }
+
     // obj.children = <chain>: the subtree now lives on another object we don't follow.
     if (
       endParent &&
@@ -874,7 +900,8 @@ export function mapComponents(
       const maxDepth = (op?.depth ?? 20) + 1;
       while (queue.length) {
         const a = queue.shift()!;
-        const key = `${a.ident}|${a.base}`;
+        // Same name in two callbacks (`.filter((m) => …).map((m) => …)`) are different aliases.
+        const key = `${a.ident}|${a.base}|${a.scope.getPos()}-${a.scope.getEnd()}|${a.node?.getPos() ?? ''}`;
         if (guard.has(key) || a.base.split('.').length > maxDepth) continue;
         guard.add(key);
         collectAccesses(a, accessed, passthrough, queue);
