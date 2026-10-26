@@ -19,12 +19,15 @@ export function closureForSpreads(
 
 /**
  * Fragments never reached from any operation (directly or transitively through
- * other fragments). By GraphQL semantics an un-spread fragment is inert, so
- * spread-reachability is the correct definition of "dead".
+ * other fragments, including `@inject` targets). By GraphQL semantics an
+ * un-spread fragment is inert, so spread-reachability is the correct definition
+ * of "dead" — except that a fragment whose generated type (`FooFragment`) is
+ * imported can't be deleted without breaking the build, so it isn't reported.
  */
 export function findDeadFragments(
   operations: GraphQLOperation[],
-  fragments: GraphQLFragment[]
+  fragments: GraphQLFragment[],
+  referencedNames: Set<string> = new Set()
 ): GraphQLFragment[] {
   const fragByName = new Map(fragments.map((f) => [f.name, f]));
   const reachable = new Set<string>();
@@ -33,5 +36,7 @@ export function findDeadFragments(
       reachable.add(name);
     }
   }
-  return fragments.filter((f) => !reachable.has(f.name));
+  return fragments.filter(
+    (f) => !reachable.has(f.name) && !referencedNames.has(`${f.name}Fragment`)
+  );
 }

@@ -110,6 +110,32 @@ function mergeField(into: FieldNode[], node: FieldNode): void {
 }
 
 /**
+ * Fragments injected into others at build time: GraphCommerce's codegen adds a
+ * fragment marked `@inject(into: ["Target"])` to every selection that spreads
+ * `Target`. Maps target name → injecting fragment names.
+ */
+function injectionMap(fragments: Iterable<FragmentDefinitionNode>): Map<string, string[]> {
+  const map = new Map<string, string[]>();
+  for (const frag of fragments) {
+    for (const dir of frag.directives ?? []) {
+      if (dir.name.value !== 'inject') continue;
+      const into = dir.arguments?.find((a) => a.name.value === 'into')?.value;
+      const targets =
+        into?.kind === Kind.LIST
+          ? into.values.filter((v) => v.kind === Kind.STRING).map((v) => (v as { value: string }).value)
+          : into?.kind === Kind.STRING
+          ? [into.value]
+          : [];
+      for (const target of targets) {
+        if (!map.has(target)) map.set(target, []);
+        map.get(target)!.push(frag.name.value);
+      }
+    }
+  }
+  return map;
+}
+
+/**
  * Walk a selection set into a FieldNode tree, inlining fragment spreads and
  * inline fragments so that `path`s reflect the true requested response shape.
  */
@@ -117,7 +143,8 @@ function walk(
   selectionSet: SelectionSetNode,
   parentPath: string,
   fragments: Map<string, FragmentDefinitionNode>,
-  seenFragments: Set<string>
+  seenFragments: Set<string>,
+  injected: Map<string, string[]> = new Map()
 ): FieldNode[] {
   const result: FieldNode[] = [];
   for (const sel of selectionSet.selections) {
@@ -126,7 +153,7 @@ function walk(
       const path = parentPath ? `${parentPath}.${responseKey}` : responseKey;
       const hasSelection = !!sel.selectionSet;
       const children = hasSelection
-        ? walk(sel.selectionSet!, path, fragments, seenFragments)
+        ? walk(sel.selectionSet!, path, fragments, seenFragments, injected)
         : [];
       mergeField(result, {
         name: sel.name.value,
@@ -137,21 +164,39 @@ function walk(
       });
     } else if (sel.kind === Kind.INLINE_FRAGMENT) {
       // Same level — merge the inline fragment's fields at parentPath.
-      for (const node of walk(sel.selectionSet, parentPath, fragments, seenFragments)) {
+      for (const node of walk(sel.selectionSet, parentPath, fragments, seenFragments, injected)) {
         mergeField(result, node);
       }
     } else if (sel.kind === Kind.FRAGMENT_SPREAD) {
-      const fragName = sel.name.value;
-      const frag = fragments.get(fragName);
-      if (frag && !seenFragments.has(fragName)) {
-        const nextSeen = new Set(seenFragments).add(fragName);
-        for (const node of walk(frag.selectionSet, parentPath, fragments, nextSeen)) {
-          mergeField(result, node);
-        }
+      for (const node of expandFragment(sel.name.value, parentPath, fragments, seenFragments, injected)) {
+        mergeField(result, node);
       }
     }
   }
   return result;
+}
+
+/** A spread fragment's fields, plus those of every fragment injected into it. */
+function expandFragment(
+  fragName: string,
+  parentPath: string,
+  fragments: Map<string, FragmentDefinitionNode>,
+  seenFragments: Set<string>,
+  injected: Map<string, string[]>
+): FieldNode[] {
+  const frag = fragments.get(fragName);
+  if (!frag || seenFragments.has(fragName)) return [];
+  const nextSeen = new Set(seenFragments).add(fragName);
+  const out: FieldNode[] = [];
+  for (const node of walk(frag.selectionSet, parentPath, fragments, nextSeen, injected)) {
+    mergeField(out, node);
+  }
+  for (const injector of injected.get(fragName) ?? []) {
+    for (const node of expandFragment(injector, parentPath, fragments, nextSeen, injected)) {
+      mergeField(out, node);
+    }
+  }
+  return out;
 }
 
 function collectPaths(fields: FieldNode[]): { leaf: string[]; all: string[] } {
@@ -191,14 +236,29 @@ export function buildModel(defs: ParsedDef[]): {
     }
   }
 
+  const injected = injectionMap(fragmentNodes.values());
+
   const operations: GraphQLOperation[] = [];
   const fragments: GraphQLFragment[] = [];
 
   for (const d of defs) {
-    const fields = walk(d.node.selectionSet, '', fragmentNodes, new Set());
+    let fields = walk(d.node.selectionSet, '', fragmentNodes, new Set(), injected);
+    let spreads = directSpreads(d.node.selectionSet);
+    if (d.node.kind === Kind.FRAGMENT_DEFINITION) {
+      // A fragment's own shape includes whatever is injected into it.
+      const self = d.node.name.value;
+      const injectors = injected.get(self) ?? [];
+      for (const injector of injectors) {
+        const merged = [...fields];
+        for (const node of expandFragment(injector, '', fragmentNodes, new Set([self]), injected)) {
+          mergeField(merged, node);
+        }
+        fields = merged;
+      }
+      spreads = Array.from(new Set([...spreads, ...injectors]));
+    }
     const { leaf, all } = collectPaths(fields);
     const depth = treeDepth(fields);
-    const spreads = directSpreads(d.node.selectionSet);
     const loc = locOf(d);
     const rawText = print(d.node);
 

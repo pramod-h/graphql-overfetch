@@ -38,7 +38,7 @@ export function runAnalysis(input: AnalyzeInput): AnalysisResult {
     fragments,
     usages,
     deadQueries: findDeadQueries(operations, referencedNames),
-    deadFragments: findDeadFragments(operations, fragments),
+    deadFragments: findDeadFragments(operations, fragments, referencedNames),
     duplicateQueries: findDuplicates(operations),
     duplicateFragments: findDuplicates(fragments),
     complexity: analyzeComplexity(operations),

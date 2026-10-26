@@ -10,6 +10,7 @@ import { buildModel } from '../src/parsers/operations';
 import { mapComponents, collectReferencedNames, collectCacheKeyFields } from '../src/analyzers/component-map';
 import { analyzeOverfetch } from '../src/analyzers/overfetch';
 import { findDeadQueries } from '../src/analyzers/dead-queries';
+import { findDeadFragments } from '../src/analyzers/dead-fragments';
 import { findDuplicates } from '../src/analyzers/duplicates';
 import { analyzeGeneratedTypes } from '../src/analyzers/generated-types';
 import { analyzeComplexity } from '../src/analyzers/complexity';
@@ -737,5 +738,42 @@ describe('shorthand pass-through', () => {
     });
     const findings = analyzeOverfetch(operations, fragments, usages, bindings);
     expect(findings.find((f) => f.operation === 'Summary')).toBeFalsy();
+  });
+});
+
+describe('fragment injection (@inject) and type-only fragments', () => {
+  const DOCS = `
+    import { gql } from 'graphql-tag';
+    export const ITEM = gql\`fragment ProductListItem on ProductInterface { sku name }\`;
+    export const SIMPLE = gql\`fragment ProductListItemSimple on SimpleProduct @inject(into: ["ProductListItem"]) { weight ...SimpleExtra }\`;
+    export const EXTRA = gql\`fragment SimpleExtra on SimpleProduct { color }\`;
+    export const LIST = gql\`query ProductList { products { items { ...ProductListItem } } }\`;
+    export const ORPHAN = gql\`fragment Orphan on ProductInterface { url_key }\`;
+    export const TYPED = gql\`fragment ProductPageName on ProductInterface { name }\`;
+  `;
+
+  it('treats injected fragments (and what they spread) as reachable', () => {
+    const { operations, fragments } = analyze({ 'q.ts': DOCS });
+    const dead = findDeadFragments(operations, fragments).map((f) => f.name);
+    expect(dead).not.toContain('ProductListItemSimple');
+    expect(dead).not.toContain('SimpleExtra');
+    expect(dead).toContain('Orphan');
+    const list = operations.find((o) => o.name === 'ProductList')!;
+    expect(list.leafPaths).toEqual(
+      expect.arrayContaining(['products.items.weight', 'products.items.color'])
+    );
+  });
+
+  it('keeps a fragment whose generated type is imported', () => {
+    const { operations, fragments, referencedNames } = analyze({
+      'q.ts': DOCS,
+      'Name.tsx': `
+        import type { ProductPageNameFragment } from './ProductPageName.gql';
+        export function Name(props: ProductPageNameFragment) { return props.name; }
+      `,
+    });
+    const dead = findDeadFragments(operations, fragments, referencedNames).map((f) => f.name);
+    expect(dead).not.toContain('ProductPageName');
+    expect(dead).toContain('Orphan');
   });
 });
