@@ -1,6 +1,6 @@
 {
   "name": "@pramod_sh/graphql-inspector",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "GraphQL static analysis CLI for React apps: detect overfetching, dead queries, dead fragments, duplicate documents, unused Code Generator types, query complexity, and schema drift across Apollo Client, urql, Relay, and graphql-request.",
   "keywords": [
     "graphql",

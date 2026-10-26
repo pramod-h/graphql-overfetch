@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.2.1 — imperative-API & destructuring fixes
+
+### Fixed
+- **Apollo Client imperative API invisible to the tracer.** `client.query({ query: DOC })` /
+  `client.mutate({ mutation: DOC })` — common in SSR/server-side data fetching
+  (e.g. Next.js `getServerSideProps` / route handlers) — were never classified
+  as GraphQL execution, so overfetch/usage tracing silently skipped these call
+  sites entirely. Now recognized, including `.then(({ data }) => ...)` promise
+  chaining.
+- **Whole-result passthrough at the root silently dropped.** Handing off the
+  *entire* query result under a new key (e.g. `return { storeConfig: data }`)
+  was ignored because the internal root path (`''`) is falsy and got skipped by
+  a truthiness check — reporting 100% overfetch on fields that were actually
+  fully consumed downstream. Root-level passthrough is now tracked correctly.
+- **Nested destructuring with defaults lost all field tracking.** The extremely
+  common Apollo pattern `const { data: { user } = {} } = useQuery(...)` was
+  silently untracked because `BindingElement.getName()` returns raw source text
+  (e.g. `"{ user }"`) instead of an identifier for nested binding patterns.
+  Fixed with recursive pattern resolution, applied consistently across result
+  destructuring, re-aliasing, and `.map()`/`.filter()` callback params.
+
 ## 0.2.0 — accuracy hardening
 
 ### Fixed
