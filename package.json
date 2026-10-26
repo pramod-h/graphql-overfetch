@@ -1,6 +1,6 @@
 {
   "name": "graphql-overfetch",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Detect GraphQL overfetching in React apps: find fields your components request but never read. Also finds dead queries, dead fragments, duplicate documents, unused Code Generator types, query complexity, and schema drift across Apollo Client, urql, Relay, and graphql-request.",
   "keywords": [
     "graphql",

@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.4.0 — accuracy, CI gating, unrequested reads
 
 ### Added
 - **`--fail-on <checks>`** for CI gating, on every command except `impact`.
