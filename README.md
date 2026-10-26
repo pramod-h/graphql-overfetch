@@ -31,6 +31,7 @@ npx graphql-overfetch            # summary report for the current directory
 - [Quick start](#quick-start)
 - [Commands](#commands)
 - [Flags](#flags)
+- [Using in CI](#using-in-ci)
 - [What it understands](#what-it-understands)
 - [How overfetch detection works (and its limits)](#how-overfetch-detection-works-and-its-limits)
 - [FAQ](#faq)
@@ -118,6 +119,56 @@ place of `graphql-overfetch`.
 | `--schema <path>` | all commands | SDL or introspection JSON; enables schema-drift detection |
 | `--ignore <globs...>` | all commands | Exclude paths (`node_modules`, generated files, tests, …) |
 | `--generated <globs...>` | `types` only | Point at codegen output when auto-detection misses it |
+| `--fail-on <checks>` | all except `impact` | Exit with code 1 if any listed check has findings — see [Using in CI](#using-in-ci) |
+
+## Using in CI
+
+`--fail-on` turns any check into a gate. Pass a comma-separated list of checks;
+if any of them has findings, the command exits with code **1** after printing
+its normal report.
+
+```bash
+npx graphql-overfetch --fail-on dead-queries,dead-fragments,schema-drift --schema ./schema.graphql
+```
+
+| Check | Fails when |
+|---|---|
+| `overfetch` | Any query requests fields its components never read |
+| `dead-queries` | Any operation is never executed |
+| `dead-fragments` | Any fragment is never spread |
+| `duplicates` | Any identical or near-identical documents exist |
+| `unused-variables` | Any operation declares a variable it never uses |
+| `complexity` | Any operation is rated **high** risk |
+| `schema-drift` | Any operation requests fields the schema no longer has (needs `--schema`) |
+| `unused-types` | Any GraphQL Code Generator type is never used |
+
+Exit codes: **0** = no findings in the selected checks, **1** = findings,
+**2** = error (bad arguments, an unknown check, or a check that can't run —
+e.g. `schema-drift` without a schema, so CI never passes silently).
+
+With `--json`, the report still goes to stdout and the failure summary goes to
+stderr, so you can save the report and gate on the exit code at once.
+
+GitHub Actions example:
+
+```yaml
+name: GraphQL usage
+on: pull_request
+jobs:
+  graphql-overfetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npx graphql-overfetch@latest --fail-on dead-queries,dead-fragments
+```
+
+Overfetch detection is a heuristic (see
+[its limits](#how-overfetch-detection-works-and-its-limits)), so start by
+gating on the dead-code checks and add `overfetch` once your project reports
+cleanly.
 
 ## What it understands
 
@@ -224,7 +275,7 @@ console.log(analysis.overfetch);
 
 ## Roadmap
 
-- HTML report (`--html`), GitHub Action, and Claude integration.
+- HTML report (`--html`), a ready-made GitHub Action, and Claude integration.
 
 ## Development
 

@@ -6,6 +6,8 @@
  */
 export { scan } from './core/scan';
 export type { ScanResult } from './core/scan';
+export { FAIL_ON_CHECKS, parseFailOn, evaluateFailOn } from './core/fail-on';
+export type { FailOnCheck, FailOnResult } from './core/fail-on';
 export { runAnalysis } from './analyzers';
 export { analyzeOverfetch } from './analyzers/overfetch';
 export { mapComponents } from './analyzers/component-map';

@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import path from 'path';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'fs';
 import { tmpdir } from 'os';
+import { spawnSync } from 'child_process';
 import { Project } from 'ts-morph';
 import { buildSchema } from 'graphql';
 import { extractTaggedTemplates } from '../src/parsers/graphql-files';
@@ -16,6 +17,7 @@ import { analyzeSchemaDrift } from '../src/analyzers/schema-drift';
 import { analyzeImpact } from '../src/analyzers/impact';
 import { detectProject } from '../src/parsers/project';
 import { scan } from '../src/core/scan';
+import { parseFailOn, evaluateFailOn } from '../src/core/fail-on';
 import { setQuiet } from '../src/utils/logger';
 
 function projectOf(files: Record<string, string>) {
@@ -469,4 +471,74 @@ describe('scan --ignore', () => {
       rmSync(root, { recursive: true, force: true });
     }
   });
+});
+
+describe('--fail-on', () => {
+  const makeFixture = () => {
+    const root = mkdtempSync(path.join(tmpdir(), 'gqo-failon-'));
+    mkdirSync(path.join(root, 'src'));
+    writeFileSync(
+      path.join(root, 'src/q.ts'),
+      `import { gql } from '@apollo/client';
+export const GET_USER = gql\`query GetUser { user { id name } }\`;
+export const DEAD = gql\`query Dead { a }\`;`
+    );
+    writeFileSync(
+      path.join(root, 'src/C.tsx'),
+      `import { useQuery } from '@apollo/client';
+import { GET_USER } from './q';
+export function C() {
+  const { data } = useQuery(GET_USER);
+  return data?.user?.name;
+}`
+    );
+    return root;
+  };
+
+  it('parses comma-separated checks and rejects unknown ones', () => {
+    expect(parseFailOn(undefined)).toEqual([]);
+    expect(parseFailOn('overfetch, dead-queries,overfetch')).toEqual(['overfetch', 'dead-queries']);
+    expect(() => parseFailOn('dead-query')).toThrow(/unknown check "dead-query".*dead-queries/);
+    expect(() => parseFailOn('')).toThrow(/Valid checks/);
+  });
+
+  it('counts findings per check and refuses checks that cannot run', () => {
+    const root = makeFixture();
+    setQuiet(true);
+    try {
+      const { analysis } = scan({ cwd: root, schema: null });
+      expect(evaluateFailOn(analysis, ['dead-queries', 'complexity'])).toEqual([
+        { check: 'dead-queries', count: 1 },
+        { check: 'complexity', count: 0 },
+      ]);
+      expect(() => evaluateFailOn(analysis, ['schema-drift'])).toThrow(/needs a schema/);
+      expect(() => evaluateFailOn(analysis, ['unused-types'])).toThrow(/Code Generator/);
+    } finally {
+      setQuiet(false);
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  it('sets the CLI exit code: 1 on findings, 0 when clean, 2 on bad input', () => {
+    const root = makeFixture();
+    const cli = (...args: string[]) =>
+      spawnSync(path.resolve('node_modules/.bin/tsx'), [path.resolve('src/cli.ts'), ...args], {
+        encoding: 'utf8',
+      });
+    try {
+      const failing = cli('unused', root, '--json', '--fail-on', 'dead-queries');
+      expect(failing.status).toBe(1);
+      expect(JSON.parse(failing.stdout).deadQueries).toEqual(['Dead']);
+      expect(failing.stderr).toContain('dead-queries (1)');
+
+      expect(cli('unused', root, '--fail-on', 'complexity').status).toBe(0);
+      expect(cli('unused', root).status).toBe(0);
+
+      const bad = cli('unused', root, '--fail-on', 'nope');
+      expect(bad.status).toBe(2);
+      expect(bad.stderr).toContain('Valid checks');
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  }, 30000);
 });

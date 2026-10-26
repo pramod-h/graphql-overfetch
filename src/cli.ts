@@ -11,6 +11,7 @@ import {
   impactCommand,
   typesCommand,
 } from './commands';
+import { FAIL_ON_CHECKS } from './core/fail-on';
 
 // package.json sits one level above both src/ (tsx) and dist/ (published build).
 const { version } = JSON.parse(
@@ -34,7 +35,13 @@ const withOpts = (cmd: Command) =>
     .argument('[path]', 'project root to analyze')
     .option('--json', 'output machine-readable JSON')
     .option('--schema <path>', 'path to schema.graphql or introspection .json')
-    .option('--ignore <globs...>', 'extra ignore globs');
+    .option('--ignore <globs...>', 'extra ignore globs')
+    .option(
+      '--fail-on <checks>',
+      `exit with code 1 if any of these checks has findings (comma-separated: ${Object.keys(
+        FAIL_ON_CHECKS
+      ).join(', ')})`
+    );
 
 withOpts(program.command('scan', { isDefault: true }).description('Full report (summary + optional details)'))
   .option('--details', 'print every section, not just the summary')
@@ -72,7 +79,8 @@ withOpts(program.command('types').description('Generated type usage / unused gen
   .option('--generated <globs...>', 'globs for generated files (overrides auto-detection)')
   .action(typesCommand);
 
+// Exit codes: 0 = ok, 1 = --fail-on findings (set by the commands), 2 = error.
 program.parseAsync(process.argv).catch((err) => {
   console.error(err instanceof Error ? err.message : err);
-  process.exit(1);
+  process.exit(2);
 });

@@ -1,9 +1,10 @@
 import path from 'path';
 import { scan } from '../core/scan';
+import { evaluateFailOn, FailOnCheck, parseFailOn } from '../core/fail-on';
 import { toJson } from '../reporters/json';
 import * as term from '../reporters/terminal';
 import { c, line, setQuiet, heading } from '../utils/logger';
-import { ScanOptions } from '../types';
+import { AnalysisResult, ScanOptions } from '../types';
 import { analyzeImpact } from '../analyzers/impact';
 
 export interface CommonOpts {
@@ -11,6 +12,7 @@ export interface CommonOpts {
   schema?: string;
   ignore?: string[];
   generated?: string[];
+  failOn?: string;
 }
 
 function optionsFrom(pathArg: string | undefined, opts: CommonOpts): ScanOptions {
@@ -22,9 +24,30 @@ function optionsFrom(pathArg: string | undefined, opts: CommonOpts): ScanOptions
   };
 }
 
-function run(pathArg: string | undefined, opts: CommonOpts) {
+function run(pathArg: string | undefined, opts: CommonOpts, analyzeTypes = false) {
+  // Parse --fail-on before scanning so a typo fails fast, not after a long scan.
+  const failOn = parseFailOn(opts.failOn);
   setQuiet(!!opts.json);
-  return scan(optionsFrom(pathArg, opts));
+  const result = scan({
+    ...optionsFrom(pathArg, opts),
+    analyzeTypes: analyzeTypes || failOn.includes('unused-types'),
+  });
+  return { ...result, failOn };
+}
+
+/** Apply --fail-on after output: exit code 1 if any selected check has findings. */
+function gate(analysis: AnalysisResult, checks: FailOnCheck[], json: boolean): void {
+  if (!checks.length) return;
+  const failed = evaluateFailOn(analysis, checks).filter((r) => r.count > 0);
+  if (!failed.length) {
+    if (!json) line(c.green(`\n✔ --fail-on passed (${checks.join(', ')})`));
+    return;
+  }
+  // stderr, so --json output on stdout stays parseable.
+  console.error(
+    c.red(`\n✖ --fail-on: ${failed.map((r) => `${r.check} (${r.count})`).join(', ')}`)
+  );
+  process.exitCode = 1;
 }
 
 function maybeParseNote(count: number, json: boolean) {
@@ -37,22 +60,27 @@ export function scanCommand(
   pathArg: string | undefined,
   opts: CommonOpts & { details?: boolean }
 ): void {
-  const { analysis, parseErrors } = run(pathArg, opts);
-  if (opts.json) return console.log(toJson(analysis));
-  term.printFull(analysis, !!opts.details);
-  maybeParseNote(parseErrors.length, false);
+  const { analysis, parseErrors, failOn } = run(pathArg, opts);
+  if (opts.json) {
+    console.log(toJson(analysis));
+  } else {
+    term.printFull(analysis, !!opts.details);
+    maybeParseNote(parseErrors.length, false);
+  }
+  gate(analysis, failOn, !!opts.json);
 }
 
 export function overfetchCommand(pathArg: string | undefined, opts: CommonOpts): void {
-  const { analysis } = run(pathArg, opts);
-  if (opts.json) return console.log(JSON.stringify(analysis.overfetch, null, 2));
-  term.printOverfetch(analysis);
+  const { analysis, failOn } = run(pathArg, opts);
+  if (opts.json) console.log(JSON.stringify(analysis.overfetch, null, 2));
+  else term.printOverfetch(analysis);
+  gate(analysis, failOn, !!opts.json);
 }
 
 export function unusedCommand(pathArg: string | undefined, opts: CommonOpts): void {
-  const { analysis } = run(pathArg, opts);
+  const { analysis, failOn } = run(pathArg, opts);
   if (opts.json) {
-    return console.log(
+    console.log(
       JSON.stringify(
         {
           deadQueries: analysis.deadQueries.map((o) => o.name ?? o.varName),
@@ -65,29 +93,35 @@ export function unusedCommand(pathArg: string | undefined, opts: CommonOpts): vo
         2
       )
     );
+  } else {
+    term.printDeadQueries(analysis);
+    term.printDeadFragments(analysis);
+    term.printUnusedVariables(analysis);
   }
-  term.printDeadQueries(analysis);
-  term.printDeadFragments(analysis);
-  term.printUnusedVariables(analysis);
+  gate(analysis, failOn, !!opts.json);
 }
 
 export function complexityCommand(pathArg: string | undefined, opts: CommonOpts): void {
-  const { analysis } = run(pathArg, opts);
-  if (opts.json) return console.log(JSON.stringify(analysis.complexity, null, 2));
-  term.printComplexity(analysis);
+  const { analysis, failOn } = run(pathArg, opts);
+  if (opts.json) console.log(JSON.stringify(analysis.complexity, null, 2));
+  else term.printComplexity(analysis);
+  gate(analysis, failOn, !!opts.json);
 }
 
 export function duplicatesCommand(pathArg: string | undefined, opts: CommonOpts): void {
-  const { analysis } = run(pathArg, opts);
-  if (opts.json)
-    return console.log(
+  const { analysis, failOn } = run(pathArg, opts);
+  if (opts.json) {
+    console.log(
       JSON.stringify(
         { queries: analysis.duplicateQueries, fragments: analysis.duplicateFragments },
         null,
         2
       )
     );
-  term.printDuplicates(analysis);
+  } else {
+    term.printDuplicates(analysis);
+  }
+  gate(analysis, failOn, !!opts.json);
 }
 
 /** `impact <Type.field | fieldName | OperationName>` — blast radius of a field. */
@@ -124,8 +158,8 @@ export function impactCommand(
 }
 
 export function typesCommand(pathArg: string | undefined, opts: CommonOpts): void {
-  setQuiet(!!opts.json);
-  const { analysis } = scan({ ...optionsFrom(pathArg, opts), analyzeTypes: true });
-  if (opts.json) return console.log(JSON.stringify(analysis.generatedTypes, null, 2));
-  term.printGeneratedTypes(analysis);
+  const { analysis, failOn } = run(pathArg, opts, true);
+  if (opts.json) console.log(JSON.stringify(analysis.generatedTypes, null, 2));
+  else term.printGeneratedTypes(analysis);
+  gate(analysis, failOn, !!opts.json);
 }

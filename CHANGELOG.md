@@ -1,5 +1,21 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- **`--fail-on <checks>`** for CI gating, on every command except `impact`.
+  Takes a comma-separated list (`overfetch`, `dead-queries`, `dead-fragments`,
+  `duplicates`, `unused-variables`, `complexity`, `schema-drift`,
+  `unused-types`) and exits with code 1 if any of them has findings. The
+  failure summary goes to stderr, so `--json` output stays parseable.
+  `schema-drift` without a schema, or `unused-types` without codegen output,
+  is an error rather than a silent pass.
+- `parseFailOn` / `evaluateFailOn` in the programmatic API.
+
+### Changed
+- **Errors now exit with code 2** (previously 1), so CI can tell a crash or
+  bad argument apart from `--fail-on` findings.
+
 ## 0.3.0 — renamed to `graphql-overfetch`
 
 ### Changed
