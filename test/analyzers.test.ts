@@ -806,3 +806,87 @@ describe('unrequested reads', () => {
     expect(findings[0].reads[0].file).toMatch(/Loyalty\.tsx$/);
   });
 });
+
+describe('tracer: data that travels further', () => {
+  const DOCS = `
+    import { gql } from '@apollo/client';
+    export const CATS = gql\`query Cats { categories { items { uid url_path name children { url_path } } } }\`;
+    export const PAGE = gql\`query Page { products { total_count page_info { total_pages current_page } items { sku name } } }\`;
+  `;
+
+  it('follows a same-file callback passed by name, recursively', () => {
+    const { operations, fragments, usages, bindings } = analyze({
+      'q.ts': DOCS,
+      'paths.ts': `
+        import { CATS } from './q';
+        export async function paths(client) {
+          const result = await client.query({ query: CATS });
+          const out = [];
+          const add = (cat) => {
+            if (cat?.url_path) out.push(cat.url_path);
+            if (cat?.children) cat.children.forEach(add);
+          };
+          result.data?.categories?.items?.forEach(add);
+          return out;
+        }
+      `,
+    });
+    const f = analyzeOverfetch(operations, fragments, usages, bindings).find((x) => x.operation === 'Cats')!;
+    expect(f.unused.map((u) => u.path)).toEqual(['categories.items.name']);
+  });
+
+  it('treats a callback imported from elsewhere, or an assignment, as passing data on', () => {
+    const { operations, fragments, usages, bindings } = analyze({
+      'q.ts': DOCS,
+      'a.ts': `
+        import { CATS } from './q';
+        import { toCategory } from './mappers';
+        export async function a(client, parent) {
+          const res = await client.query({ query: CATS });
+          parent.children = res.data?.categories;
+          return res.data.categories.items.map(toCategory);
+        }
+      `,
+    });
+    expect(analyzeOverfetch(operations, fragments, usages, bindings).find((x) => x.operation === 'Cats')).toBeFalsy();
+  });
+
+  it('follows a query promise stored and awaited later', () => {
+    const { operations, fragments, usages, bindings } = analyze({
+      'q.ts': DOCS,
+      'static.ts': `
+        import { PAGE } from './q';
+        export async function getPaths(client) {
+          const query = client.query({ query: PAGE });
+          const { data } = await query;
+          const pages = (await query).data.products.page_info.total_pages;
+          return [pages, data.products.items.map((p) => p.sku)];
+        }
+      `,
+    });
+    const f = analyzeOverfetch(operations, fragments, usages, bindings).find((x) => x.operation === 'Page')!;
+    expect(f.unused.map((u) => u.path).sort()).toEqual([
+      'products.items.name',
+      'products.page_info.current_page',
+      'products.total_count',
+    ]);
+  });
+
+  it("doesn't count a React dependency array as reading the subtree", () => {
+    const { operations, fragments, usages, bindings } = analyze({
+      'q.ts': DOCS,
+      'Review.tsx': `
+        import { useQuery } from '@apollo/client';
+        import { useEffect } from 'react';
+        import { PAGE } from './q';
+        export function Review() {
+          const { data } = useQuery(PAGE);
+          useEffect(() => {}, [data?.products?.items]);
+          return data?.products?.items?.[0]?.sku;
+        }
+      `,
+    });
+    const f = analyzeOverfetch(operations, fragments, usages, bindings).find((x) => x.operation === 'Page')!;
+    expect(f.unused.map((u) => u.path)).toContain('products.items.name');
+  });
+});

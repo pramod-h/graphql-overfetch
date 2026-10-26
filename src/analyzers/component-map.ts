@@ -413,16 +413,45 @@ function resultAliases(
   return aliases;
 }
 
-/** Bind an iteration callback's element param(s) as aliases rooted at `base`. */
+/** Global functions passed as callbacks (`.filter(Boolean)`) that read no fields. */
+const BUILTIN_CALLBACKS = new Set(['Boolean', 'String', 'Number', 'isFinite', 'isNaN', 'parseInt', 'parseFloat']);
+
+/** A same-file function declared by name: `function add(c) {}` or `const add = (c) => …`. */
+function localFunction(name: string, from: Node): Node | null {
+  const sf = from.getSourceFile();
+  const fn = sf.getDescendantsOfKind(SyntaxKind.FunctionDeclaration).find((f) => f.getName() === name);
+  if (fn) return fn;
+  for (const decl of sf.getDescendantsOfKind(SyntaxKind.VariableDeclaration)) {
+    if (decl.getName() !== name) continue;
+    const init = decl.getInitializer();
+    if (init && (Node.isArrowFunction(init) || Node.isFunctionExpression(init))) return init;
+  }
+  return null;
+}
+
+/**
+ * Bind an iteration callback's element param(s) as aliases rooted at `base`.
+ * Returns false when the callback can't be followed (e.g. a function imported
+ * from another file), so the caller treats the elements as handed off whole.
+ */
 function bindCallbackParams(
   call: CallExpression,
   base: string,
   method: string,
   queue: Alias[]
-): void {
-  const cb = call.getArguments()[0];
-  if (!cb || !(Node.isArrowFunction(cb) || Node.isFunctionExpression(cb))) return;
+): boolean {
+  let cb: Node | undefined = call.getArguments()[0];
+  if (cb && Node.isIdentifier(cb)) {
+    if (BUILTIN_CALLBACKS.has(cb.getText())) return true;
+    const resolved = localFunction(cb.getText(), cb);
+    if (!resolved) return false;
+    cb = resolved;
+  }
+  if (!cb || !(Node.isArrowFunction(cb) || Node.isFunctionExpression(cb) || Node.isFunctionDeclaration(cb))) {
+    return true;
+  }
   const body = cb.getBody();
+  if (!body) return true;
   const params = cb.getParameters();
   const elementParams = REDUCE_METHODS.has(method)
     ? [params[1]]
@@ -447,6 +476,19 @@ function bindCallbackParams(
       }
     }
   }
+  return true;
+}
+
+/** Hooks whose last argument is a dependency array: listing a value there reads nothing. */
+const DEPENDENCY_HOOKS = new Set(['useEffect', 'useLayoutEffect', 'useMemo', 'useCallback', 'useInsertionEffect']);
+
+function isDependencyArray(node: Node): boolean {
+  const call = node.getParent();
+  if (!call || !Node.isCallExpression(call)) return false;
+  const callee = call.getExpression();
+  const name = Node.isPropertyAccessExpression(callee) ? callee.getName() : callee.getText();
+  const args = call.getArguments();
+  return DEPENDENCY_HOOKS.has(name) && args[args.length - 1] === node;
 }
 
 const WHOLE_OBJECT_PARENTS = new Set([
@@ -513,7 +555,7 @@ function collectAccesses(
         if (isMethodCall) {
           const call = gp as CallExpression;
           if (CB_ELEMENT_METHODS.has(name) || REDUCE_METHODS.has(name)) {
-            bindCallbackParams(call, curPath, name, queue);
+            if (!bindCallbackParams(call, curPath, name, queue)) passthrough.add(curPath);
           }
           if (curPath) accessed.add(curPath);
           if (SHAPE_PRESERVING.has(name)) {
@@ -545,7 +587,8 @@ function collectAccesses(
       if (
         Node.isNonNullExpression(parent) ||
         Node.isParenthesizedExpression(parent) ||
-        Node.isAsExpression(parent)
+        Node.isAsExpression(parent) ||
+        Node.isAwaitExpression(parent) // const r = client.query(...); … (await r).data
       ) {
         cur = parent;
         continue;
@@ -570,10 +613,25 @@ function collectAccesses(
       break;
     }
 
-    if (!sawData) continue; // never reached the data tree (e.g. `result.loading`)
-
     // How is the chain endpoint consumed?
     const endParent = cur.getParent();
+
+    if (!sawData) {
+      // The whole result moved to another variable before `.data` was read:
+      // const r2 = await r  /  const { data } = await r
+      if (endParent && Node.isVariableDeclaration(endParent) && endParent.getInitializer() === cur) {
+        const bn = endParent.getNameNode();
+        if (Node.isIdentifier(bn)) {
+          queue.push({ ident: bn.getText(), base: curPath, scope: alias.scope, viaData: true });
+        } else if (Node.isObjectBindingPattern(bn)) {
+          for (const el of bn.getElements()) {
+            const prop = el.getPropertyNameNode()?.getText() ?? el.getName();
+            if (prop === 'data') bindNamePattern(el.getNameNode(), curPath, alias.scope, queue);
+          }
+        }
+      }
+      continue; // never reached the data tree (e.g. `result.loading`)
+    }
 
     // const x = <chain>  → re-alias
     if (endParent && Node.isVariableDeclaration(endParent) && endParent.getInitializer() === cur) {
@@ -599,6 +657,24 @@ function collectAccesses(
     // legitimately be '' here (the entire operation result passed on wholesale,
     // e.g. `return { storeConfig: data }`) — must not be dropped just because
     // '' is falsy.
+    // obj.children = <chain>: the subtree now lives on another object we don't follow.
+    if (
+      endParent &&
+      Node.isBinaryExpression(endParent) &&
+      endParent.getOperatorToken().getKind() === SyntaxKind.EqualsToken &&
+      endParent.getRight() === cur
+    ) {
+      passthrough.add(curPath);
+      if (curPath) accessed.add(curPath);
+      continue;
+    }
+
+    // useEffect(fn, [data.items]) only compares the value; it reads no fields.
+    if (endParent && Node.isArrayLiteralExpression(endParent) && isDependencyArray(endParent)) {
+      if (curPath) accessed.add(curPath);
+      continue;
+    }
+
     if (endParent && WHOLE_OBJECT_PARENTS.has(endParent.getKind())) {
       passthrough.add(curPath);
       if (curPath) accessed.add(curPath);
@@ -721,10 +797,13 @@ export function mapComponents(
       const queue = resultAliases(call, library, hook, scope, direct);
       const hasResultAliases = queue.length > 0;
       const guard = new Set<string>();
+      // Recursive callbacks (cat.children.forEach(add) inside add) deepen the path
+      // each round; stop once it's deeper than any document could be.
+      const maxDepth = (op?.depth ?? 20) + 1;
       while (queue.length) {
         const a = queue.shift()!;
         const key = `${a.ident}|${a.base}`;
-        if (guard.has(key)) continue;
+        if (guard.has(key) || a.base.split('.').length > maxDepth) continue;
         guard.add(key);
         collectAccesses(a, accessed, passthrough, queue);
       }
