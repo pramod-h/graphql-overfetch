@@ -74,8 +74,11 @@ interface Alias {
   base: string;
   /** Scope to search for references (defaults to the enclosing function). */
   scope: Node;
-  /** When true, skip a leading `.data` segment (identifier holds the whole hook result). */
-  viaData?: boolean;
+  /**
+   * true: the identifier holds a `{ data }` result, so skip a leading `.data`.
+   * 'auto': unknown client — skip `.data` only if that's the first thing read.
+   */
+  viaData?: boolean | 'auto';
 }
 
 /** Resolution indexes built once from the parsed model. */
@@ -158,9 +161,15 @@ interface Classified {
   hook: string;
   docArg: Node | null;
   generatedName: string | null;
-  /** The call resolves to the data itself, not a `{ data }` result object. */
-  direct?: boolean;
+  /** The call resolves to the data itself, not a `{ data }` result object. 'auto' = unknown client. */
+  direct?: boolean | 'auto';
 }
+
+/** Calls that take a document without executing it. */
+const NON_EXECUTING = new Set([
+  'print', 'parse', 'String', 'mergeOperations', 'readQuery', 'writeQuery',
+  'readFragment', 'writeFragment', 'updateQuery', 'refetchQueries', 'expect', 'getOperationAST',
+]);
 
 /** Classify a call as a GraphQL execution and return its library + doc argument. */
 function classifyCall(call: CallExpression): Classified | null {
@@ -344,7 +353,7 @@ function resultAliases(
   library: Library,
   hook: string,
   scope: Node,
-  direct = false
+  direct: boolean | 'auto' = false
 ): Alias[] {
   const aliases: Alias[] = [];
   // Only a variable initialised with the call's result itself holds the result.
@@ -358,7 +367,13 @@ function resultAliases(
 
   // Read straight off the call: useQuery(DOC).data?.page, (await fetch()).user
   if (holderParent && Node.isPropertyAccessExpression(holderParent) && holderParent.getExpression() === holder) {
-    aliases.push({ ident: '', node: holder, base: '', scope, viaData: !direct && library !== 'relay' && hook !== 'useFragment' });
+    aliases.push({
+      ident: '',
+      node: holder,
+      base: '',
+      scope,
+      viaData: direct === 'auto' ? 'auto' : !direct && library !== 'relay' && hook !== 'useFragment',
+    });
   }
 
   const pushObjData = (objPattern: Node, altScope?: Node) => {
@@ -369,7 +384,13 @@ function resultAliases(
     }
   };
 
-  if (nameNode && direct) {
+  const hasDataKey =
+    !!nameNode &&
+    Node.isObjectBindingPattern(nameNode) &&
+    nameNode.getElements().some((el) => (el.getPropertyNameNode()?.getText() ?? el.getName()) === 'data');
+  if (nameNode && direct === 'auto' && Node.isIdentifier(nameNode)) {
+    aliases.push({ ident: nameNode.getText(), base: '', scope, viaData: 'auto', declNode: nameNode });
+  } else if (nameNode && direct && !(direct === 'auto' && hasDataKey)) {
     // The result IS the data: const data = await request(...) / const { user } = await ...
     bindNamePattern(nameNode, '', scope, aliases);
   } else if (nameNode) {
@@ -636,7 +657,8 @@ function collectAccesses(
 
     let cur: Node = ref;
     let curPath = alias.base;
-    let sawData = !alias.viaData;
+    let sawData = alias.viaData !== true;
+    let autoData = alias.viaData === 'auto';
 
     // Walk up the member-access / index chain.
     // eslint-disable-next-line no-constant-condition
@@ -664,6 +686,14 @@ function collectAccesses(
           break;
         }
 
+        // Unknown client: a leading `.data` means it returned `{ data }`.
+        if (autoData) {
+          autoData = false;
+          if (name === 'data') {
+            cur = parent;
+            continue;
+          }
+        }
         // Plain field access — extend the path (skip the leading `.data`).
         if (!sawData) {
           if (name === 'data') {
@@ -769,6 +799,17 @@ function collectAccesses(
         bindNamePattern(memoDecl.getNameNode(), curPath, alias.scope, queue);
       } else {
         passthrough.add(curPath);
+      }
+      if (curPath) accessed.add(curPath);
+      continue;
+    }
+
+    // for (const item of <chain>) / for (const { name } of <chain>): the loop
+    // variable is one element of the list.
+    if (endParent && Node.isForOfStatement(endParent) && endParent.getExpression() === cur) {
+      const init = endParent.getInitializer();
+      if (Node.isVariableDeclarationList(init)) {
+        for (const d of init.getDeclarations()) bindNamePattern(d.getNameNode(), curPath, alias.scope, queue);
       }
       if (curPath) accessed.add(curPath);
       continue;
@@ -979,8 +1020,20 @@ export function mapComponents(
     const file = sf.getFilePath();
     const { named, namespaces } = importsFor(file);
     for (const call of sf.getDescendantsOfKind(SyntaxKind.CallExpression)) {
-      const classified = classifyCall(call);
-      if (!classified) continue;
+      let classified = classifyCall(call);
+      if (!classified) {
+        // A project's own client function called with a known document:
+        // gql(CATEGORY_TREE, vars), api.fetch(GET_CART). Result shape unknown.
+        const arg = call.getArguments()[0];
+        const callee = call.getExpression();
+        const calleeName = Node.isPropertyAccessExpression(callee) ? callee.getName() : callee.getText();
+        const argName = arg && (Node.isIdentifier(arg) || Node.isPropertyAccessExpression(arg))
+          ? (Node.isIdentifier(arg) ? arg.getText() : arg.getName())
+          : null;
+        const docName = argName ? named.get(argName)?.imported ?? argName : null;
+        if (!docName || NON_EXECUTING.has(calleeName) || !opsByVar.has(docName)) continue;
+        classified = { library: 'unknown', hook: callee.getText(), docArg: arg, generatedName: null, direct: 'auto' };
+      }
       const { library, hook, docArg, generatedName, direct } = classified;
 
       const identifier = generatedName ?? docIdentifier(docArg) ?? inlineDocName(docArg);

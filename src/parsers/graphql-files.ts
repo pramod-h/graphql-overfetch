@@ -45,8 +45,7 @@ export function extractGraphqlFiles(
 
 /** Reconstruct a parseable document from a tagged template, dropping `${...}`. */
 function templateText(tt: Node): string | null {
-  const template = (tt as any).getTemplate?.();
-  if (!template) return null;
+  const template = Node.isTaggedTemplateExpression(tt) ? tt.getTemplate() : tt;
   if (Node.isNoSubstitutionTemplateLiteral(template)) {
     return template.getLiteralText();
   }
@@ -75,13 +74,26 @@ export function extractTaggedTemplates(
 
   for (const sf of project.getSourceFiles()) {
     const file = sf.getFilePath();
-    const tagged = sf.getDescendantsOfKind(SyntaxKind.TaggedTemplateExpression);
-    for (const tt of tagged) {
+    // gql`…` tagged templates, and graphql(`…`) calls (GraphQL Code Generator's
+    // client-preset, gql.tada). `site` is the expression holding the document.
+    const docs: { site: Node; template: Node }[] = [];
+    for (const tt of sf.getDescendantsOfKind(SyntaxKind.TaggedTemplateExpression)) {
       const tag = tt.getTag().getText();
       const bare = tag.split('.')[0].split('(')[0];
-      if (!GQL_TAGS.has(bare) && !tag.endsWith('gql')) continue;
-
-      const text = templateText(tt);
+      if (GQL_TAGS.has(bare) || tag.endsWith('gql')) docs.push({ site: tt, template: tt.getTemplate() });
+    }
+    for (const call of sf.getDescendantsOfKind(SyntaxKind.CallExpression)) {
+      const arg = call.getArguments()[0];
+      if (
+        GQL_TAGS.has(call.getExpression().getText()) &&
+        arg &&
+        (Node.isNoSubstitutionTemplateLiteral(arg) || Node.isTemplateExpression(arg))
+      ) {
+        docs.push({ site: call, template: arg });
+      }
+    }
+    for (const { site: tt, template } of docs) {
+      const text = templateText(template);
       if (!text || !text.trim()) continue;
 
       const startLine = tt.getStartLineNumber();

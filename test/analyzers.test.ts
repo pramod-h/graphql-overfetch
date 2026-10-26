@@ -1174,3 +1174,66 @@ describe('untraceable call sites', () => {
     expect(analyzeOverfetch(operations, fragments, usages, bindings)).toEqual([]);
   });
 });
+
+describe('for...of loops', () => {
+  it('binds the loop variable to a list element, incl. destructuring and push', () => {
+    const { operations, fragments, usages, bindings } = analyze({
+      'q.ts': `
+        import { gql } from '@apollo/client';
+        export const WISH = gql\`query Wish { wishlist { items { sku name price } } inputs { name type } }\`;
+      `,
+      'useWish.ts': `
+        import { useQuery } from '@apollo/client';
+        import { useMemo } from 'react';
+        import { WISH } from './q';
+        export const useWish = () => {
+          const { data } = useQuery(WISH);
+          const items = useMemo(() => {
+            const out = [];
+            for (const item of data?.wishlist?.items ?? []) out.push(item);
+            return out;
+          }, [data]);
+          const names = [];
+          for (const { name } of data?.inputs ?? []) names.push(name);
+          return [items, names];
+        };
+      `,
+    });
+    const f = analyzeOverfetch(operations, fragments, usages, bindings).find((x) => x.operation === 'Wish')!;
+    expect(f.unused.map((u) => u.path)).toEqual(['inputs.type']);
+  });
+});
+
+describe('client-preset documents and custom clients', () => {
+  it('parses graphql(`…`) calls and traces a project client function', () => {
+    const { operations, fragments, usages, bindings, referencedNames } = analyze({
+      'queries.ts': `
+        import { graphql } from './gql';
+        export const CATEGORY_TREE = graphql(\`query CategoryTree { categoryTree { name url_key children { name description } } }\`);
+        export const CART = graphql(\`query Cart { cart { id total } }\`);
+      `,
+      'get-menu.ts': `
+        import { gqlClient } from './client';
+        import { CATEGORY_TREE, CART } from './queries';
+        export async function getMenu() {
+          const gql = gqlClient();
+          const { categoryTree } = await gql(CATEGORY_TREE, {});
+          const res = await gql(CART, {});
+          return [categoryTree.children.map((c) => c.name), res.data.cart.total];
+        }
+      `,
+    });
+    expect(operations.map((o) => o.name).sort()).toEqual(['Cart', 'CategoryTree']);
+    expect(findDeadQueries(operations, referencedNames)).toEqual([]);
+    const findings = analyzeOverfetch(operations, fragments, usages, bindings);
+    const tree = findings.find((f) => f.operation === 'CategoryTree')!;
+    expect(tree.unused.map((u) => u.path).sort()).toEqual([
+      'categoryTree.children.description',
+      'categoryTree.name',
+      'categoryTree.url_key',
+    ]);
+    // { data } shape detected for the second call: total is read, nothing unrequested
+    expect(findings.find((f) => f.operation === 'Cart')).toBeFalsy();
+    expect(analyzeUnrequestedReads(operations, fragments, usages, bindings)).toEqual([]);
+  });
+});
