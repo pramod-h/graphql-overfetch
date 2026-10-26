@@ -73,7 +73,10 @@ export function scanCommand(
 export function overfetchCommand(pathArg: string | undefined, opts: CommonOpts): void {
   const { analysis, failOn } = run(pathArg, opts);
   if (opts.json) console.log(JSON.stringify(analysis.overfetch, null, 2));
-  else term.printOverfetch(analysis);
+  else {
+    term.printOverfetch(analysis);
+    term.printUnrequestedReads(analysis);
+  }
   gate(analysis, failOn, !!opts.json);
 }
 

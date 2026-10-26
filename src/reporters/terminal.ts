@@ -28,6 +28,7 @@ export function printSummary(a: AnalysisResult): void {
   issue('Duplicate queries', a.duplicateQueries.length);
   issue('Duplicate fragments', a.duplicateFragments.length);
   issue('Overfetching queries', a.overfetch.length);
+  issue('Unrequested reads', a.unrequestedReads.length);
   if (a.schemaLoaded) issue('Schema drift', a.schemaDrift.length);
   else kv('  Schema drift', c.dim('n/a (pass --schema to enable)'));
 
@@ -137,6 +138,17 @@ export function printComplexity(a: AnalysisResult): void {
   }
 }
 
+export function printUnrequestedReads(a: AnalysisResult): void {
+  heading(`Unrequested reads  ·  read in code but not in the query (always undefined)`);
+  if (!a.unrequestedReads.length) return line(c.green('  None.'));
+  for (const f of a.unrequestedReads) {
+    line(`\n${c.bold(f.operation)}  ${c.dim(rel(a.project.root, f.file) + ':' + f.line)}`);
+    for (const r of f.reads) {
+      line(`    ${c.red('?')} ${r.path} ${c.dim('read at ' + rel(a.project.root, r.file) + ':' + r.line)}`);
+    }
+  }
+}
+
 export function printSchemaDrift(a: AnalysisResult): void {
   heading(`Schema drift  ·  ${a.schemaLoaded ? a.schemaDrift.length : 'n/a'}`);
   if (!a.schemaLoaded) return line(c.dim('  No schema found — pass --schema <path> to enable.'));
@@ -195,6 +207,7 @@ export function printFull(a: AnalysisResult, details: boolean): void {
   printSummary(a);
   if (details) {
     printOverfetch(a);
+    printUnrequestedReads(a);
     printDeadQueries(a);
     printDeadFragments(a);
     printDuplicates(a);

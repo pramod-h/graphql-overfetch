@@ -15,9 +15,11 @@ export function toJson(a: AnalysisResult): string {
         duplicateQueries: a.duplicateQueries.length,
         duplicateFragments: a.duplicateFragments.length,
         overfetchingQueries: a.overfetch.length,
+        unrequestedReads: a.unrequestedReads.length,
         schemaDrift: a.schemaLoaded ? a.schemaDrift.length : null,
       },
       overfetch: a.overfetch,
+      unrequestedReads: a.unrequestedReads,
       deadQueries: a.deadQueries.map((o) => ({
         name: o.name,
         operation: o.operation,

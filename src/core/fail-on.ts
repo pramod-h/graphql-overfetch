@@ -6,6 +6,7 @@ import { AnalysisResult } from '../types';
  */
 export const FAIL_ON_CHECKS = {
   overfetch: (a: AnalysisResult) => a.overfetch.length,
+  'unrequested-reads': (a: AnalysisResult) => a.unrequestedReads.length,
   'dead-queries': (a: AnalysisResult) => a.deadQueries.length,
   'dead-fragments': (a: AnalysisResult) => a.deadFragments.length,
   duplicates: (a: AnalysisResult) => a.duplicateQueries.length + a.duplicateFragments.length,

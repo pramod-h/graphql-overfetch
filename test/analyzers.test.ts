@@ -9,6 +9,7 @@ import { extractTaggedTemplates } from '../src/parsers/graphql-files';
 import { buildModel } from '../src/parsers/operations';
 import { mapComponents, collectReferencedNames, collectCacheKeyFields } from '../src/analyzers/component-map';
 import { analyzeOverfetch } from '../src/analyzers/overfetch';
+import { analyzeUnrequestedReads } from '../src/analyzers/unrequested-reads';
 import { findDeadQueries } from '../src/analyzers/dead-queries';
 import { findDeadFragments } from '../src/analyzers/dead-fragments';
 import { findDuplicates } from '../src/analyzers/duplicates';
@@ -775,5 +776,33 @@ describe('fragment injection (@inject) and type-only fragments', () => {
     const dead = findDeadFragments(operations, fragments, referencedNames).map((f) => f.name);
     expect(dead).not.toContain('ProductPageName');
     expect(dead).toContain('Orphan');
+  });
+});
+
+describe('unrequested reads', () => {
+  it('reports a field read off the result that the query never requests', () => {
+    const { operations, fragments, usages, bindings } = analyze({
+      'q.ts': `
+        import { gql } from '@apollo/client';
+        export const GET_CART = gql\`query GetCart { cart { id items { sku } custom_json } }\`;
+      `,
+      'Loyalty.tsx': `
+        import { useQuery } from '@apollo/client';
+        import { GET_CART } from './q';
+        export function Loyalty({ setOptin }) {
+          useQuery(GET_CART, { onCompleted: (res) => setOptin(res?.cart?.wants_to_enroll) });
+          const { data } = useQuery(GET_CART);
+          const n = data?.cart?.items?.length;          // .length is not a field
+          const x = data?.cart?.custom_json?.foo;       // below a scalar (JSON)
+          const y = data?.somethingElse?.bar;           // top-level: too ambiguous
+          return [n, x, y];
+        }
+      `,
+    });
+    const findings = analyzeUnrequestedReads(operations, fragments, usages, bindings);
+    expect(findings).toHaveLength(1);
+    expect(findings[0].operation).toBe('GetCart');
+    expect(findings[0].reads.map((r) => r.path)).toEqual(['cart.wants_to_enroll']);
+    expect(findings[0].reads[0].file).toMatch(/Loyalty\.tsx$/);
   });
 });

@@ -111,6 +111,15 @@ export interface OverfetchFinding {
   reason?: 'result-discarded';
 }
 
+/** Fields the code reads off a result but the operation never requests. */
+export interface UnrequestedReadFinding {
+  operation: string;
+  file: string;
+  line: number;
+  /** Each missing field path, with one place it's read. */
+  reads: { path: string; file: string; line: number }[];
+}
+
 export interface DuplicateGroup {
   members: { name: string; file: string; line: number }[];
   /** 1.0 = identical field sets; < 1.0 = near-duplicate (Jaccard). */
@@ -166,6 +175,7 @@ export interface AnalysisResult {
   duplicateFragments: DuplicateGroup[];
   complexity: ComplexityReport[];
   overfetch: OverfetchFinding[];
+  unrequestedReads: UnrequestedReadFinding[];
   schemaDrift: SchemaDriftFinding[];
   schemaLoaded: boolean;
   /** Populated only by the `types` command (opt-in via ScanOptions.analyzeTypes). */

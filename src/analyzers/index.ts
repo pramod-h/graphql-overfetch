@@ -12,6 +12,7 @@ import { findDeadFragments } from './dead-fragments';
 import { findDuplicates } from './duplicates';
 import { analyzeComplexity } from './complexity';
 import { analyzeOverfetch } from './overfetch';
+import { analyzeUnrequestedReads } from './unrequested-reads';
 import { analyzeSchemaDrift } from './schema-drift';
 
 export interface AnalyzeInput {
@@ -43,6 +44,7 @@ export function runAnalysis(input: AnalyzeInput): AnalysisResult {
     duplicateFragments: findDuplicates(fragments),
     complexity: analyzeComplexity(operations),
     overfetch: analyzeOverfetch(operations, fragments, usages, bindings, cacheKeyFields),
+    unrequestedReads: analyzeUnrequestedReads(operations, fragments, usages, bindings),
     schemaDrift: analyzeSchemaDrift(schema, operations, fragments),
     schemaLoaded: !!schema,
     generatedTypes: null,

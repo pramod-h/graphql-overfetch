@@ -136,6 +136,7 @@ npx graphql-overfetch --fail-on dead-queries,dead-fragments,schema-drift --schem
 | Check | Fails when |
 |---|---|
 | `overfetch` | Any query requests fields its components never read |
+| `unrequested-reads` | Code reads a field the query never requests (always `undefined`) |
 | `dead-queries` | Any operation is never executed |
 | `dead-fragments` | Any fragment is never spread |
 | `duplicates` | Any identical or near-identical documents exist |
