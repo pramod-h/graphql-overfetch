@@ -1,11 +1,11 @@
-# GraphQL Inspector — Detect GraphQL Overfetching, Dead Queries & Unused Fields in React Apps
+# graphql-overfetch — Detect GraphQL Overfetching, Dead Queries & Unused Fields in React Apps
 
-[![npm version](https://img.shields.io/npm/v/@pramod_sh/graphql-inspector.svg)](https://www.npmjs.com/package/@pramod_sh/graphql-inspector)
-[![npm downloads](https://img.shields.io/npm/dm/@pramod_sh/graphql-inspector.svg)](https://www.npmjs.com/package/@pramod_sh/graphql-inspector)
-[![license: MIT](https://img.shields.io/npm/l/@pramod_sh/graphql-inspector.svg)](./LICENSE)
-[![node](https://img.shields.io/node/v/@pramod_sh/graphql-inspector.svg)](https://www.npmjs.com/package/@pramod_sh/graphql-inspector)
+[![npm version](https://img.shields.io/npm/v/graphql-overfetch.svg)](https://www.npmjs.com/package/graphql-overfetch)
+[![npm downloads](https://img.shields.io/npm/dm/graphql-overfetch.svg)](https://www.npmjs.com/package/graphql-overfetch)
+[![license: MIT](https://img.shields.io/npm/l/graphql-overfetch.svg)](./LICENSE)
+[![node](https://img.shields.io/node/v/graphql-overfetch.svg)](https://www.npmjs.com/package/graphql-overfetch)
 
-**GraphQL Inspector** is a zero-config, static-analysis CLI that shows you how your
+**graphql-overfetch** is a zero-config, static-analysis CLI that shows you how your
 frontend **actually uses GraphQL** — not just what your schema or documents look
 like. It traces the full chain **GraphQL operation → hook → React component → UI**
 to find overfetching, dead queries, dead fragments, duplicate documents, unused
@@ -15,13 +15,18 @@ on your machine: no server, no account, no code leaves your computer.
 Works with **Apollo Client**, **urql**, **Relay**, and **graphql-request**, in
 **React**, **Next.js**, TypeScript, and plain JavaScript projects.
 
+> **Renamed:** this package was previously published as
+> `@pramod_sh/graphql-inspector`. Run it with `npx graphql-overfetch` now. The
+> `graphql-inspector` and `gqi` commands are now `graphql-overfetch` and `gqo`;
+> every subcommand and flag is unchanged.
+
 ```bash
-npx @pramod_sh/graphql-inspector            # summary report for the current directory
+npx graphql-overfetch            # summary report for the current directory
 ```
 
 ## Table of contents
 
-- [Why GraphQL Inspector](#why-graphql-inspector)
+- [Why graphql-overfetch](#why-graphql-overfetch)
 - [Install](#install)
 - [Quick start](#quick-start)
 - [Commands](#commands)
@@ -34,7 +39,7 @@ npx @pramod_sh/graphql-inspector            # summary report for the current dir
 - [Roadmap](#roadmap)
 - [Development](#development)
 
-## Why GraphQL Inspector
+## Why graphql-overfetch
 
 Most GraphQL tooling — linters, codegen, schema validators — checks whether your
 **documents are well-formed**. None of it tells you whether the **fields you're
@@ -62,47 +67,47 @@ ecosystem:
 No install required — run it with `npx`:
 
 ```bash
-npx @pramod_sh/graphql-inspector
+npx graphql-overfetch
 ```
 
 Or add it as a dev dependency for repeatable CI runs (it's a dev-time analysis
 tool, not a runtime dependency of your app):
 
 ```bash
-npm install --save-dev @pramod_sh/graphql-inspector
+npm install --save-dev graphql-overfetch
 # or
-yarn add -D @pramod_sh/graphql-inspector
+yarn add -D graphql-overfetch
 ```
 
 ## Quick start
 
 ```bash
-npx @pramod_sh/graphql-inspector            # full summary for the current directory
-npx @pramod_sh/graphql-inspector --details  # every section, expanded
+npx graphql-overfetch            # full summary for the current directory
+npx graphql-overfetch --details  # every section, expanded
 ```
 
-Once installed, both `graphql-inspector` and the short alias `gqi` are
+Once installed, both `graphql-overfetch` and the short alias `gqo` are
 available:
 
 ```bash
-npx gqi overfetch ./src --schema ./schema.graphql
+npx gqo overfetch ./src --schema ./schema.graphql
 ```
 
 ## Commands
 
 | Command | What it reports |
 |---|---|
-| `graphql-inspector [path]` | Full report across every analyzer (add `--details`) |
-| `graphql-inspector overfetch [path]` | ⭐ Fields requested but never read in components |
-| `graphql-inspector unused [path]` | Dead queries, dead fragments, unused variables |
-| `graphql-inspector complexity [path]` | Query depth / field-count risk |
-| `graphql-inspector duplicates [path]` | Identical & near-identical documents |
-| `graphql-inspector impact <Type.field>` | Affected operations, fragments, and components for a schema field |
-| `graphql-inspector types [path]` | Unused GraphQL Code Generator types |
+| `graphql-overfetch [path]` | Full report across every analyzer (add `--details`) |
+| `graphql-overfetch overfetch [path]` | ⭐ Fields requested but never read in components |
+| `graphql-overfetch unused [path]` | Dead queries, dead fragments, unused variables |
+| `graphql-overfetch complexity [path]` | Query depth / field-count risk |
+| `graphql-overfetch duplicates [path]` | Identical & near-identical documents |
+| `graphql-overfetch impact <Type.field>` | Affected operations, fragments, and components for a schema field |
+| `graphql-overfetch types [path]` | Unused GraphQL Code Generator types |
 
-`[path]` defaults to the current directory. `gqi` is a drop-in short alias for
-`graphql-inspector` — every command above works identically with `gqi` in
-place of `graphql-inspector`.
+`[path]` defaults to the current directory. `gqo` is a drop-in short alias for
+`graphql-overfetch` — every command above works identically with `gqo` in
+place of `graphql-overfetch`.
 
 ## Flags
 
@@ -157,10 +162,10 @@ extra payload, extra parsing, extra bandwidth, with zero user-facing benefit.
 It's invisible to schema validators and linters because the query is
 perfectly valid GraphQL; you only see it by cross-referencing the query
 against how the *component* consumes the result, which is exactly what
-`graphql-inspector overfetch` does.
+`graphql-overfetch overfetch` does.
 
 **Does this replace ESLint / `graphql-eslint` / GraphQL Code Generator?**
-No — those validate document syntax and generate types. GraphQL Inspector is
+No — those validate document syntax and generate types. graphql-overfetch is
 complementary: it analyzes runtime *usage* (which fields are actually read),
 a dimension none of those tools cover.
 
@@ -212,7 +217,7 @@ crying wolf — but be aware:
 ## Programmatic use
 
 ```ts
-import { scan } from '@pramod_sh/graphql-inspector';
+import { scan } from 'graphql-overfetch';
 const { analysis } = scan({ cwd: process.cwd() });
 console.log(analysis.overfetch);
 ```
@@ -224,8 +229,8 @@ console.log(analysis.overfetch);
 ## Development
 
 ```bash
-git clone https://github.com/pramod-h/graphql-inspector.git
-cd graphql-inspector
+git clone https://github.com/pramod-h/graphql-overfetch.git
+cd graphql-overfetch
 yarn install
 yarn dev overfetch ../some-graphql-project   # run from source
 yarn build && yarn test

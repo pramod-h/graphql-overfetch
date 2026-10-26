@@ -14,7 +14,7 @@ const confColor: Record<string, (s: string) => string> = {
 };
 
 export function printSummary(a: AnalysisResult): void {
-  heading('GraphQL Inspector');
+  heading('graphql-overfetch');
   kv('Operations', a.operations.length);
   kv('Fragments', a.fragments.length);
   kv('Components', a.stats.components);

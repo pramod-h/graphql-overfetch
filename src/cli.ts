@@ -20,7 +20,7 @@ const { version } = JSON.parse(
 const program = new Command();
 
 program
-  .name('graphql-inspector')
+  .name('graphql-overfetch')
   .description(
     'Understand how your frontend actually uses GraphQL — dead queries, duplicates, complexity, schema drift, and overfetch analysis.'
   )

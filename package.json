@@ -1,10 +1,10 @@
 {
-  "name": "@pramod_sh/graphql-inspector",
-  "version": "0.2.2",
-  "description": "GraphQL static analysis CLI for React apps: detect overfetching, dead queries, dead fragments, duplicate documents, unused Code Generator types, query complexity, and schema drift across Apollo Client, urql, Relay, and graphql-request.",
+  "name": "graphql-overfetch",
+  "version": "0.3.0",
+  "description": "Detect GraphQL overfetching in React apps: find fields your components request but never read. Also finds dead queries, dead fragments, duplicate documents, unused Code Generator types, query complexity, and schema drift across Apollo Client, urql, Relay, and graphql-request.",
   "keywords": [
     "graphql",
-    "graphql-inspector",
+    "graphql-overfetch",
     "overfetch",
     "overfetching",
     "static-analysis",
@@ -26,13 +26,13 @@
   ],
   "license": "MIT",
   "author": "Pramod H",
-  "homepage": "https://github.com/pramod-h/graphql-inspector#readme",
+  "homepage": "https://github.com/pramod-h/graphql-overfetch#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pramod-h/graphql-inspector.git"
+    "url": "git+https://github.com/pramod-h/graphql-overfetch.git"
   },
   "bugs": {
-    "url": "https://github.com/pramod-h/graphql-inspector/issues"
+    "url": "https://github.com/pramod-h/graphql-overfetch/issues"
   },
   "publishConfig": {
     "access": "public"
@@ -41,8 +41,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "graphql-inspector": "dist/cli.js",
-    "gqi": "dist/cli.js"
+    "graphql-overfetch": "dist/cli.js",
+    "gqo": "dist/cli.js"
   },
   "files": [
     "dist",

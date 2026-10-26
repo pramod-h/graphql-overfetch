@@ -1,7 +1,7 @@
 /**
- * Programmatic API for @pramod_sh/graphql-inspector.
+ * Programmatic API for graphql-overfetch.
  *
- *   import { scan } from '@pramod_sh/graphql-inspector';
+ *   import { scan } from 'graphql-overfetch';
  *   const { analysis } = scan({ cwd: process.cwd() });
  */
 export { scan } from './core/scan';

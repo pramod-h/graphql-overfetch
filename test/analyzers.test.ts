@@ -446,7 +446,7 @@ describe('relay', () => {
 
 describe('scan --ignore', () => {
   it('excludes ignored TS/JS source files, not just .graphql files', () => {
-    const root = mkdtempSync(path.join(tmpdir(), 'gqi-ignore-'));
+    const root = mkdtempSync(path.join(tmpdir(), 'gqo-ignore-'));
     mkdirSync(path.join(root, 'src/generated'), { recursive: true });
     mkdirSync(path.join(root, 'src/pages'), { recursive: true });
     writeFileSync(path.join(root, 'src/App.tsx'), 'export const App = () => null;');

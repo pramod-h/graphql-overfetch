@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.3.0 — renamed to `graphql-overfetch`
+
+### Changed
+- **Package renamed** from `@pramod_sh/graphql-inspector` to `graphql-overfetch`.
+  The old name clashed with The Guild's GraphQL Inspector (`@graphql-inspector/cli`),
+  including its `graphql-inspector` command.
+- **Commands renamed:** `graphql-inspector` → `graphql-overfetch`, `gqi` → `gqo`.
+  Subcommands, flags, JSON output, and the programmatic API are unchanged.
+
+### Migrating
+- `npx @pramod_sh/graphql-inspector …` → `npx graphql-overfetch …`
+- `npm uninstall @pramod_sh/graphql-inspector && npm install --save-dev graphql-overfetch`,
+  then update scripts that call `graphql-inspector` or `gqi`.
+- `import { scan } from '@pramod_sh/graphql-inspector'` → `import { scan } from 'graphql-overfetch'`
+
 ## 0.2.2 — `--ignore` & `--version` fixes
 
 ### Fixed
