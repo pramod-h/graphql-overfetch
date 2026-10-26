@@ -5,6 +5,8 @@
 [![license: MIT](https://img.shields.io/npm/l/graphql-overfetch.svg)](./LICENSE)
 [![node](https://img.shields.io/node/v/graphql-overfetch.svg)](https://www.npmjs.com/package/graphql-overfetch)
 
+![graphql-overfetch finding unused fields, a dead query and a dead fragment in a small Apollo app](https://raw.githubusercontent.com/pramod-h/graphql-overfetch/main/docs/demo.gif)
+
 **graphql-overfetch** is a zero-config, static-analysis CLI that shows you how your
 frontend **actually uses GraphQL** — not just what your schema or documents look
 like. It traces the full chain **GraphQL operation → hook → React component → UI**

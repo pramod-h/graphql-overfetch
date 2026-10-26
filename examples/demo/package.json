@@ -1,0 +1,10 @@
+{
+  "name": "graphql-overfetch-demo",
+  "private": true,
+  "description": "Small Apollo + React app with deliberate overfetching, used to record the README demo.",
+  "dependencies": {
+    "@apollo/client": "^3.11.0",
+    "graphql": "^16.9.0",
+    "react": "^18.3.1"
+  }
+}
