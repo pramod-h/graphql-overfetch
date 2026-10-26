@@ -1,3 +1,4 @@
+import fg from 'fast-glob';
 import { Project } from 'ts-morph';
 import { AnalysisResult, ScanOptions } from '../types';
 import { detectProject } from '../parsers/project';
@@ -12,6 +13,8 @@ import { mapComponents, collectReferencedNames } from '../analyzers/component-ma
 import { runAnalysis } from '../analyzers';
 import { analyzeGeneratedTypes } from '../analyzers/generated-types';
 import { spinner } from '../utils/logger';
+
+const SOURCE_IGNORE = DEFAULT_IGNORE.filter((g) => g !== '**/*.d.ts');
 
 export interface ScanResult {
   analysis: AnalysisResult;
@@ -38,13 +41,16 @@ export function scan(options: ScanOptions): ScanResult {
     skipAddingFilesFromTsConfig: true,
     skipFileDependencyResolution: true,
   });
-  tsProject.addSourceFilesAtPaths([
-    `${root}/**/*.{ts,tsx,js,jsx}`,
-    `!${root}/**/node_modules/**`,
-    `!${root}/**/dist/**`,
-    `!${root}/**/.next/**`,
-    `!${root}/**/build/**`,
-  ]);
+  // Glob ourselves so user `--ignore` patterns (relative to root) apply here
+  // too. `.d.ts` stays in: codegen output can be declaration files. Files are
+  // added one by one because paths like `[id].tsx` are not safe as globs.
+  const sourceFiles = fg.sync('**/*.{ts,tsx,js,jsx}', {
+    cwd: root,
+    absolute: true,
+    ignore: [...SOURCE_IGNORE, ...(options.ignore ?? [])],
+    suppressErrors: true,
+  });
+  for (const file of sourceFiles) tsProject.addSourceFileAtPath(file);
   const sourceFileCount = tsProject.getSourceFiles().length;
 
   sp.text = 'Scanning GraphQL documents…';

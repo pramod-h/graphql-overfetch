@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+- **`--ignore` now applies to TS/JS source files.** Previously it only excluded
+  `.graphql`/`.gql` files; component mapping, overfetch, and tagged-template
+  scanning still read every source file. `coverage/` is now skipped by default
+  as well.
+- **`--version` reported `0.2.0`.** It is now read from `package.json`.
+
 ## 0.2.1 — imperative-API & destructuring fixes
 
 ### Fixed
@@ -30,8 +39,8 @@
   resolving each usage to a single operation object. This correctly handles
   duplicate operation definitions and custom-hook / Venia-talon indirection, and
   is precision-biased (won't call a query dead just because the exact hook
-  couldn't be traced). Real-world impact: `frontend-ajmal` 89 → 69 dead queries,
-  `highgate-graphcommerce` 25 → 7 — with the remainder verified genuinely unused.
+  couldn't be traced). Real-world impact on two production storefronts: 89 → 69
+  and 25 → 7 dead queries, with the remainder verified genuinely unused.
 - **Relay hooks misclassified.** `useLazyLoadQuery` / `usePreloadedQuery` matched
   the codegen generated-hook pattern (`use` + `LazyLoad` + `Query`) and were
   mislabeled; they're now recognized as Relay. Inline `graphql`…`` documents

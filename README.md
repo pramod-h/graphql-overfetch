@@ -26,12 +26,12 @@ npx @pramod_sh/graphql-inspector            # summary report for the current dir
 - [Quick start](#quick-start)
 - [Commands](#commands)
 - [Flags](#flags)
-- [What it detects](#what-it-detects)
-- [Supported libraries & patterns](#supported-libraries--patterns)
+- [What it understands](#what-it-understands)
 - [How overfetch detection works (and its limits)](#how-overfetch-detection-works-and-its-limits)
 - [FAQ](#faq)
 - [Known limitations](#known-limitations)
 - [Programmatic use](#programmatic-use)
+- [Roadmap](#roadmap)
 - [Development](#development)
 
 ## Why GraphQL Inspector
@@ -183,7 +183,7 @@ The tracer is precision-biased but not perfect — see
 Context, Redux, deeply indirect custom hooks) it can't yet see through.
 Treat findings as a strong signal to review, not an automatic delete list.
 
-## Known limitations (v0.2)
+## Known limitations
 
 This is a static heuristic. Where it can't see something, it errs toward *not*
 crying wolf — but be aware:

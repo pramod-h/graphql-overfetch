@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import path from 'path';
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'fs';
+import { tmpdir } from 'os';
 import { Project } from 'ts-morph';
 import { buildSchema } from 'graphql';
 import { extractTaggedTemplates } from '../src/parsers/graphql-files';
@@ -13,6 +15,8 @@ import { analyzeComplexity } from '../src/analyzers/complexity';
 import { analyzeSchemaDrift } from '../src/analyzers/schema-drift';
 import { analyzeImpact } from '../src/analyzers/impact';
 import { detectProject } from '../src/parsers/project';
+import { scan } from '../src/core/scan';
+import { setQuiet } from '../src/utils/logger';
 
 function projectOf(files: Record<string, string>) {
   const project = new Project({
@@ -437,5 +441,32 @@ describe('relay', () => {
     expect(findDeadQueries(operations, referencedNames).map((o) => o.name)).not.toContain(
       'CScreenQuery'
     );
+  });
+});
+
+describe('scan --ignore', () => {
+  it('excludes ignored TS/JS source files, not just .graphql files', () => {
+    const root = mkdtempSync(path.join(tmpdir(), 'gqi-ignore-'));
+    mkdirSync(path.join(root, 'src/generated'), { recursive: true });
+    mkdirSync(path.join(root, 'src/pages'), { recursive: true });
+    writeFileSync(path.join(root, 'src/App.tsx'), 'export const App = () => null;');
+    writeFileSync(path.join(root, 'src/pages/[id].tsx'), 'export default () => null;');
+    writeFileSync(
+      path.join(root, 'src/generated/q.ts'),
+      'import { gql } from "@apollo/client";\nexport const Q = gql`query Gen { a }`;'
+    );
+    setQuiet(true);
+    try {
+      const all = scan({ cwd: root, schema: null });
+      expect(all.analysis.stats.sourceFiles).toBe(3);
+      expect(all.analysis.operations.map((o) => o.name)).toContain('Gen');
+
+      const ignored = scan({ cwd: root, schema: null, ignore: ['src/generated/**'] });
+      expect(ignored.analysis.stats.sourceFiles).toBe(2);
+      expect(ignored.analysis.operations.map((o) => o.name)).not.toContain('Gen');
+    } finally {
+      setQuiet(false);
+      rmSync(root, { recursive: true, force: true });
+    }
   });
 });

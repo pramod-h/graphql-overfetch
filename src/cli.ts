@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+import { readFileSync } from 'fs';
+import path from 'path';
 import { Command } from 'commander';
 import {
   scanCommand,
@@ -10,6 +12,11 @@ import {
   typesCommand,
 } from './commands';
 
+// package.json sits one level above both src/ (tsx) and dist/ (published build).
+const { version } = JSON.parse(
+  readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8')
+) as { version: string };
+
 const program = new Command();
 
 program
@@ -17,7 +24,7 @@ program
   .description(
     'Understand how your frontend actually uses GraphQL — dead queries, duplicates, complexity, schema drift, and overfetch analysis.'
   )
-  .version('0.2.0');
+  .version(version);
 
 // Shared options. NOTE: options/actions must live on subcommands, never on the
 // root program — a root action + argument silently breaks subcommand option
