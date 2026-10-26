@@ -1,9 +1,7 @@
 <!--
-DRAFT, not published. Numbers come from docs/launch/results.md (graphql-overfetch 0.3.0).
-results.md recommends fixing the main false-positive patterns and re-running
-before publishing; update the numbers below after that re-run.
-Publish only after the release that includes --fail-on (planned 0.4.0); the
-CI example below doesn't work with 0.3.0.
+DRAFT, not published. Numbers come from docs/launch/results.md ("next" build).
+Publish together with the release that contains those fixes and --fail-on
+(planned 0.4.0); 0.3.0 doesn't match these numbers or the CI example.
 -->
 
 # Your GraphQL queries are probably asking for fields nobody renders
@@ -62,19 +60,27 @@ complexity and, with a schema, schema drift.
 I ran it on two public, production-grade Magento storefronts:
 [PWA Studio](https://github.com/magento/pwa-studio) and
 [GraphCommerce](https://github.com/graphcommerce-org/graphcommerce). Then I
-did the part most tool announcements skip: I traced every reported field by
-hand to see whether it really was unused.
+did the part most tool announcements skip: I traced every reported field
+through the code to see whether it really was unused.
 
 | | PWA Studio | GraphCommerce |
 |---|---:|---:|
 | Operations scanned | 221 | 172 |
-| Overfetching queries reported | 7 | 19 |
-| Fields reported unused | 23 | 92 |
-| …actually unused (hand-checked) | 15 | 31 |
-| Overfetch precision* | 79% | 46% |
+| Fields reported unused | 56 | 90 |
+| …actually unused (checked) | 56 | 90 |
+| Dead queries / fragments reported | 1 / 3 | 10 / 5 |
+| …actually dead (checked) | 1 / 3 | 10 / 5 |
 
-\* Leaving out `id`, `uid` and `__typename`, which Apollo's cache needs even
-when no component reads them.
+It took three rounds to get there. The first release was right 79% of the time
+on PWA Studio and only 46% on GraphCommerce. Each wrong report pointed at a
+code shape the tracer didn't follow, such as operations maps, wrapper hooks,
+`@inject` fragments and `useMemo`. Fixing those took both codebases to zero
+false reports while finding more real ones. Where it still can't follow the
+data, it now stays silent instead of guessing.
+
+"Unused" doesn't always mean "delete it". About half the findings come
+through shared fragments that are there on purpose, so other components get
+their data from the Apollo cache. The rest are plain leftovers.
 
 Each scan took a few seconds. The full method, raw output and every verdict are
 in the [results write-up](https://github.com/pramod-h/graphql-overfetch/blob/main/docs/launch/results.md).
@@ -99,34 +105,25 @@ products widget (`getProductsByUrlKey`) requests `total_count` and the full
 then renders only `data.products.items`. Filters are the expensive part: the
 server has to compute aggregations for them.
 
-**Half a payment config at checkout.** GraphCommerce's Adyen integration
-(`UseAdyenPaymentMethods`) requests 14 fields that nothing in the package
-reads, such as `brand`, `brands`, `merchantId`, `merchantName` and the
-`details { … }` block. The UI uses only each method's `type`, `name`, `icon`
-and `issuers`.
+**A shipping block the billing form never shows.** GraphCommerce's
+`GetBillingAddress` selects the cart's full `shipping_addresses` block through
+the shared `CartBillingAddress` fragment. The billing form reads only the
+billing address.
 
 None of these are bugs, and nothing crashes. They're the slow drift that
 makes every query a little heavier than the screen needs.
 
 ## Where it gets things wrong
 
-The hand check also showed where the tool is wrong, and it's wrong more often
-on GraphCommerce than on PWA Studio. The main causes:
+It's a static tracer, so it can only report what it can follow. When data
+leaves for somewhere it can't see — a hook that returns `{ ...a, ...b }` read in
+another file, a query promise collected for `Promise.all`, a Redux store — it
+treats the data as used and says nothing. That means it misses some real
+overfetch (the results write-up lists every one the hand check found), but it
+doesn't tell you to delete fields your app needs.
 
-- **Data that travels further than the tool follows.** For example, results
-  passed through Next.js `getStaticProps` page props, read in a callback
-  declared elsewhere (`items.forEach(add)`), or stored as a promise and
-  awaited later.
-- **Cache fields.** `__typename`, `id` and `uid` are reported even though
-  Apollo needs them.
-- **Framework conventions.** GraphCommerce injects fragments at build time
-  with an `@inject` directive, so most of the fragments the tool calls "dead"
-  are actually used.
-
-Each pattern is documented with a real example in the
-[results write-up](https://github.com/pramod-h/graphql-overfetch/blob/main/docs/launch/results.md).
-Until they're fixed, treat the findings as a list to review, not a list to
-delete. That's also why each finding carries a confidence level.
+It also flags fields that are unused but deliberate, like cache-filling
+fragments. Treat the output as a list to review, not a list to delete.
 
 ## Try it
 

@@ -11,6 +11,51 @@
   `schema-drift` without a schema, or `unused-types` without codegen output,
   is an error rather than a silent pass.
 - `parseFailOn` / `evaluateFailOn` in the programmatic API.
+- **Unrequested reads**: fields the code reads off a result that the query
+  never requests (always `undefined`). Shown in the report and `--json`, and
+  available as `--fail-on unrequested-reads`.
+- **Discarded results**: when every call site awaits an operation and throws
+  the result away (graphql-request, codegen fetchers; no normalized cache),
+  the whole selection is reported, for mutations too.
+- **More ways of running queries are recognised:**
+  - GraphQL Code Generator static fetchers (`useFooQuery.fetcher(vars)()`).
+  - Client-preset / gql.tada `graphql(\`…\`)` documents.
+  - A project's own client function called with a document
+    (`gql(CATEGORY_TREE, vars)`).
+  - Custom wrapper hooks (`useCartQuery(CartDocument)`).
+  - `operations.X` and operations-map keys.
+  - Inline `gql` passed to `client.query`.
+  - `graphql-request`'s `client.request(DOC)`.
+- **More ways of reading results are followed:** callbacks passed by name
+  (`items.forEach(add)`), `useMemo`, `for…of` loops, `...rest`, awaited and
+  stored promises, `const [run, result] = useLazyQuery()`, and reads straight
+  off the call (`useQuery(DOC).data?.x`).
+- **GraphCommerce `@inject(into: [...])`** fragment injection is modelled.
+
+### Fixed
+Accuracy, measured by checking every finding against the code of PWA Studio
+and GraphCommerce: overfetch precision went from 79% / 46% to 100% / 100%,
+while finding more real overfetch. See `docs/launch/results.md`.
+- `id`, `uid`, `__typename`, typePolicies `keyFields` and fields read with
+  `readField()` are no longer reported as overfetch. Clients without a
+  cache still report an unread `id`.
+- A subtree returned as `return { x }` counts as passed on.
+- Results handed somewhere the tracer can't follow (`Promise.all([...])`,
+  `fn(result)`, `return result`) count as fully used, instead of letting
+  other call sites alone decide.
+- Same-named document constants and operations-map keys in different files
+  are told apart through imports, including tsconfig path aliases. This
+  applies to overfetch attribution and to dead queries.
+- References shadowed by an inner variable of the same name are ignored.
+- React dependency arrays no longer count as reading a whole subtree.
+- Fragments used only as generated TypeScript types aren't reported dead,
+  including with codegen's `dedupeOperationSuffix`. Same-named per-edition
+  fragments (`.ee.js` / `.ce.js`) contribute the union of their fields.
+- `.graphql` files read at build time by path aren't reported dead, and
+  inline anonymous documents never are.
+- Duplicates compare real field names, arguments and variables (not
+  aliases). Mutations, `@client` documents and `{ id __typename }` stubs
+  aren't grouped as near-duplicates.
 
 ### Changed
 - **Errors now exit with code 2** (previously 1), so CI can tell a crash or

@@ -1,0 +1,2828 @@
+{
+  "summary": {
+    "operations": 221,
+    "fragments": 46,
+    "components": 125,
+    "sourceFiles": 1565,
+    "graphqlFiles": 4,
+    "deadQueries": 1,
+    "deadFragments": 3,
+    "duplicateQueries": 23,
+    "duplicateFragments": 1,
+    "overfetchingQueries": 11,
+    "unrequestedReads": 0,
+    "schemaDrift": null
+  },
+  "overfetch": [
+    {
+      "operation": "GetCustomerCartAddress",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/AddressBook/addressBook.gql.js",
+      "line": 21,
+      "requestedCount": 9,
+      "usedCount": 2,
+      "unused": [
+        {
+          "path": "customerCart.email",
+          "confidence": "medium"
+        },
+        {
+          "path": "customerCart.shipping_addresses.city",
+          "confidence": "medium"
+        },
+        {
+          "path": "customerCart.shipping_addresses.country.label",
+          "confidence": "medium"
+        },
+        {
+          "path": "customerCart.shipping_addresses.postcode",
+          "confidence": "medium"
+        },
+        {
+          "path": "customerCart.shipping_addresses.region.label",
+          "confidence": "medium"
+        },
+        {
+          "path": "customerCart.shipping_addresses.region.region_id",
+          "confidence": "medium"
+        },
+        {
+          "path": "customerCart.shipping_addresses.telephone",
+          "confidence": "medium"
+        }
+      ],
+      "estimatedReductionPct": 78
+    },
+    {
+      "operation": "GetWishlistItemsForLocalField",
+      "file": "packages/peregrine/lib/hooks/useCustomerWishlistSkus/customerWishlist.gql.ce.js",
+      "line": 5,
+      "requestedCount": 3,
+      "usedCount": 1,
+      "unused": [
+        {
+          "path": "customer.wishlists.items_v2.page_info.current_page",
+          "confidence": "medium"
+        },
+        {
+          "path": "customer.wishlists.items_v2.page_info.total_pages",
+          "confidence": "medium"
+        }
+      ],
+      "estimatedReductionPct": 67
+    },
+    {
+      "operation": "getSelectedAndAvailableShippingMethods",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/ShippingMethod/shippingMethod.gql.js",
+      "line": 12,
+      "requestedCount": 17,
+      "usedCount": 8,
+      "unused": [
+        {
+          "path": "cart.email",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.city",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.country.label",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.firstname",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.lastname",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.postcode",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.region.label",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.region.region_id",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.telephone",
+          "confidence": "medium"
+        }
+      ],
+      "estimatedReductionPct": 53
+    },
+    {
+      "operation": "GetCartDetails",
+      "file": "packages/peregrine/lib/talons/CartPage/cartPage.gql.js",
+      "line": 5,
+      "requestedCount": 37,
+      "usedCount": 18,
+      "unused": [
+        {
+          "path": "cart.applied_gift_cards.applied_balance.currency",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.applied_gift_cards.applied_balance.value",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.applied_gift_cards.current_balance.currency",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.applied_gift_cards.current_balance.value",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.applied_taxes.amount.currency",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.applied_taxes.amount.value",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.discounts.amount.currency",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.discounts.amount.value",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.discounts.label",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.gift_options.printed_card.currency",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.gift_options.printed_card.value",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.grand_total.currency",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.grand_total.value",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.subtotal_excluding_tax.currency",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.subtotal_excluding_tax.value",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.subtotal_including_tax.currency",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.subtotal_including_tax.value",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.selected_shipping_method.amount.currency",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.selected_shipping_method.amount.value",
+          "confidence": "medium"
+        }
+      ],
+      "estimatedReductionPct": 51
+    },
+    {
+      "operation": "GetFilterInputsForModal",
+      "file": "packages/peregrine/lib/talons/FilterModal/filterModal.gql.js",
+      "line": 4,
+      "requestedCount": 2,
+      "usedCount": 1,
+      "unused": [
+        {
+          "path": "__type.inputFields.type.name",
+          "confidence": "medium"
+        }
+      ],
+      "estimatedReductionPct": 50
+    },
+    {
+      "operation": "getItemCount",
+      "file": "packages/venia-ui/lib/components/Header/cartTrigger.gql.js",
+      "line": 6,
+      "requestedCount": 2,
+      "usedCount": 1,
+      "unused": [
+        {
+          "path": "cart.total_quantity",
+          "confidence": "medium"
+        }
+      ],
+      "estimatedReductionPct": 50
+    },
+    {
+      "operation": "GetRobotsConfig",
+      "file": "packages/venia-ui/lib/components/RobotsMeta/robotsMeta.gql.js",
+      "line": 4,
+      "requestedCount": 2,
+      "usedCount": 1,
+      "unused": [
+        {
+          "path": "robotsConfig.customInstructions",
+          "confidence": "medium"
+        }
+      ],
+      "estimatedReductionPct": 50
+    },
+    {
+      "operation": "getProductsByUrlKey",
+      "file": "packages/pagebuilder/lib/ContentTypes/Products/products.js",
+      "line": 283,
+      "requestedCount": 15,
+      "usedCount": 9,
+      "unused": [
+        {
+          "path": "products.filters.filter_items_count",
+          "confidence": "medium"
+        },
+        {
+          "path": "products.filters.filter_items.label",
+          "confidence": "medium"
+        },
+        {
+          "path": "products.filters.filter_items.value_string",
+          "confidence": "medium"
+        },
+        {
+          "path": "products.filters.name",
+          "confidence": "medium"
+        },
+        {
+          "path": "products.filters.request_var",
+          "confidence": "medium"
+        },
+        {
+          "path": "products.total_count",
+          "confidence": "medium"
+        }
+      ],
+      "estimatedReductionPct": 40
+    },
+    {
+      "operation": "GetStoreConfigForLiveSearchPopover",
+      "file": "packages/extensions/venia-pwa-live-search/src/queries/liveSearchPopoverConfigs.gql.js",
+      "line": 4,
+      "requestedCount": 13,
+      "usedCount": 8,
+      "unused": [
+        {
+          "path": "storeConfig.base_currency_code",
+          "confidence": "medium"
+        },
+        {
+          "path": "storeConfig.ls_allow_all",
+          "confidence": "medium"
+        },
+        {
+          "path": "storeConfig.ls_autocomplete_limit",
+          "confidence": "medium"
+        },
+        {
+          "path": "storeConfig.ls_display_out_of_stock",
+          "confidence": "medium"
+        },
+        {
+          "path": "storeConfig.ls_page_size_options",
+          "confidence": "medium"
+        }
+      ],
+      "estimatedReductionPct": 38
+    },
+    {
+      "operation": "GetStoreConfigForLiveSearchPLP",
+      "file": "packages/extensions/venia-pwa-live-search/src/queries/liveSearchPlpConfigs.gql.js",
+      "line": 4,
+      "requestedCount": 15,
+      "usedCount": 12,
+      "unused": [
+        {
+          "path": "storeConfig.base_currency_code",
+          "confidence": "medium"
+        },
+        {
+          "path": "storeConfig.ls_autocomplete_limit",
+          "confidence": "medium"
+        },
+        {
+          "path": "storeConfig.ls_service_api_key",
+          "confidence": "medium"
+        }
+      ],
+      "estimatedReductionPct": 20
+    },
+    {
+      "operation": "MiniCartQuery",
+      "file": "packages/venia-ui/lib/components/MiniCart/miniCart.gql.js",
+      "line": 11,
+      "requestedCount": 17,
+      "usedCount": 15,
+      "unused": [
+        {
+          "path": "cart.prices.subtotal_including_tax.currency",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.subtotal_including_tax.value",
+          "confidence": "medium"
+        }
+      ],
+      "estimatedReductionPct": 12
+    }
+  ],
+  "unrequestedReads": [],
+  "deadQueries": [
+    {
+      "name": "GetCart",
+      "operation": "query",
+      "file": "packages/extensions/venia-product-recommendations/lib/queries/getCart.gql.js",
+      "line": 50
+    }
+  ],
+  "deadFragments": [
+    {
+      "name": "WishlistFragment",
+      "typeCondition": "Wishlist",
+      "file": "packages/peregrine/lib/talons/WishlistPage/wishlistFragment.gql.ee.js",
+      "line": 16
+    },
+    {
+      "name": "WishlistFragment",
+      "typeCondition": "Wishlist",
+      "file": "packages/peregrine/lib/talons/WishlistPage/wishlistFragment.gql.js",
+      "line": 14
+    },
+    {
+      "name": "AddressBookFragment",
+      "typeCondition": "Customer",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/AddressBook/addressBookFragments.gql.js",
+      "line": 23
+    }
+  ],
+  "duplicateQueries": [
+    {
+      "members": [
+        {
+          "name": "getStoreConfigData",
+          "file": "packages/pagebuilder/lib/ContentTypes/Products/products.js",
+          "line": 327
+        },
+        {
+          "name": "getStoreConfigData",
+          "file": "packages/peregrine/lib/talons/CmsDynamicBlock/cmsDynamicBlock.gql.js",
+          "line": 88
+        },
+        {
+          "name": "GetProductURLSuffix",
+          "file": "packages/peregrine/lib/talons/OrderHistoryPage/orderHistoryContext.gql.js",
+          "line": 4
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "AddProductToCartFromDialog",
+          "file": "packages/peregrine/lib/talons/AddToCartDialog/addToCartDialog.gql.js",
+          "line": 72
+        },
+        {
+          "name": "AddWishlistItemToCart",
+          "file": "packages/peregrine/lib/talons/WishlistPage/wishlistItem.gql.js",
+          "line": 8
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "createCart",
+          "file": "packages/peregrine/lib/talons/AddToCartDialog/useAddToCartDialog.js",
+          "line": 39
+        },
+        {
+          "name": "createCart",
+          "file": "packages/peregrine/lib/talons/CheckoutPage/checkoutPage.gql.js",
+          "line": 9
+        },
+        {
+          "name": "CreateCartAfterAccountCreation",
+          "file": "packages/peregrine/lib/talons/CreateAccount/createAccount.gql.js",
+          "line": 54
+        },
+        {
+          "name": "createCart",
+          "file": "packages/peregrine/lib/talons/Gallery/useAddToCartButton.js",
+          "line": 35
+        },
+        {
+          "name": "createCart",
+          "file": "packages/peregrine/lib/talons/ProductFullDetail/useProductFullDetail.js",
+          "line": 464
+        },
+        {
+          "name": "CreateCartAfterSignIn",
+          "file": "packages/peregrine/lib/talons/SignIn/signIn.gql.js",
+          "line": 26
+        },
+        {
+          "name": "createCart",
+          "file": "packages/peregrine/lib/talons/WishlistPage/useWishlistItem.js",
+          "line": 24
+        },
+        {
+          "name": "createCart",
+          "file": "packages/venia-ui/lib/components/Checkout/flow.js",
+          "line": 130
+        },
+        {
+          "name": "CreateCartWithCartOptions",
+          "file": "packages/venia-ui/lib/components/LegacyMiniCart/cartOptions.js",
+          "line": 147
+        },
+        {
+          "name": "CreateCartWithProduct",
+          "file": "packages/venia-ui/lib/components/LegacyMiniCart/product.js",
+          "line": 124
+        },
+        {
+          "name": "CreateCartAfterCheckout",
+          "file": "packages/peregrine/lib/talons/CheckoutPage/OrderConfirmationPage/createAccount.gql.js",
+          "line": 53
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "SignOutFromModal",
+          "file": "packages/peregrine/lib/talons/AuthModal/authModal.gql.js",
+          "line": 4
+        },
+        {
+          "name": "SignOutFromMenu",
+          "file": "packages/peregrine/lib/talons/Header/accountMenu.gql.js",
+          "line": 4
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "GetStoreConfigForBreadcrumbs",
+          "file": "packages/peregrine/lib/talons/Breadcrumbs/breadcrumbs.gql.js",
+          "line": 4
+        },
+        {
+          "name": "GetStoreConfigForCategoryList",
+          "file": "packages/peregrine/lib/talons/CategoryList/categoryList.gql.js",
+          "line": 6
+        },
+        {
+          "name": "GetStoreConfigForCategoryTree",
+          "file": "packages/peregrine/lib/talons/CategoryTree/categoryTree.gql.js",
+          "line": 4
+        },
+        {
+          "name": "GetStoreConfigForMegaMenu",
+          "file": "packages/peregrine/lib/talons/MegaMenu/megaMenu.gql.js",
+          "line": 3
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "GetCustomerAfterCreate",
+          "file": "packages/peregrine/lib/talons/CreateAccount/createAccount.gql.js",
+          "line": 34
+        },
+        {
+          "name": "GetCustomerForLeftNav",
+          "file": "packages/peregrine/lib/talons/Navigation/navigation.gql.js",
+          "line": 4
+        },
+        {
+          "name": "GetCustomerAfterSignIn",
+          "file": "packages/peregrine/lib/talons/SignIn/signIn.gql.js",
+          "line": 6
+        },
+        {
+          "name": "GetCustomerAfterCheckout",
+          "file": "packages/peregrine/lib/talons/CheckoutPage/OrderConfirmationPage/createAccount.gql.js",
+          "line": 33
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "SignInAfterCreate",
+          "file": "packages/peregrine/lib/talons/CreateAccount/createAccount.gql.js",
+          "line": 46
+        },
+        {
+          "name": "SignIn",
+          "file": "packages/peregrine/lib/talons/SignIn/signIn.gql.js",
+          "line": 18
+        },
+        {
+          "name": "SignInAfterCheckout",
+          "file": "packages/peregrine/lib/talons/CheckoutPage/OrderConfirmationPage/createAccount.gql.js",
+          "line": 45
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "GetCartDetailsAfterAccountCreation",
+          "file": "packages/peregrine/lib/talons/CreateAccount/createAccount.gql.js",
+          "line": 60
+        },
+        {
+          "name": "GetCartDetailsAfterCheckout",
+          "file": "packages/peregrine/lib/talons/CheckoutPage/OrderConfirmationPage/createAccount.gql.js",
+          "line": 59
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "MergeCartsAfterAccountCreation",
+          "file": "packages/peregrine/lib/talons/CreateAccount/createAccount.gql.js",
+          "line": 111
+        },
+        {
+          "name": "MergeCartsAfterSignIn",
+          "file": "packages/peregrine/lib/talons/SignIn/signIn.gql.js",
+          "line": 32
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "GetFilterInputsForModal",
+          "file": "packages/peregrine/lib/talons/FilterModal/filterModal.gql.js",
+          "line": 4
+        },
+        {
+          "name": "GetFilterInputsForSearch",
+          "file": "packages/peregrine/lib/talons/SearchPage/searchPage.gql.js",
+          "line": 91
+        },
+        {
+          "name": "GetFilterInputsForCategory",
+          "file": "packages/peregrine/lib/talons/RootComponents/Category/category.gql.js",
+          "line": 34
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "GetStoreConfigDataForGalleryMOS",
+          "file": "packages/peregrine/lib/talons/Gallery/gallery.gql.ce.js",
+          "line": 4
+        },
+        {
+          "name": "GetStoreConfigForCarouselMOS",
+          "file": "packages/pagebuilder/lib/ContentTypes/Products/Carousel/carousel.gql.ce.js",
+          "line": 4
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "GetStoreConfigDataForGalleryAC",
+          "file": "packages/peregrine/lib/talons/Gallery/gallery.gql.ee.js",
+          "line": 4
+        },
+        {
+          "name": "GetStoreConfigForCarouselAC",
+          "file": "packages/pagebuilder/lib/ContentTypes/Products/Carousel/carousel.gql.ee.js",
+          "line": 4
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "getCurrencyData",
+          "file": "packages/peregrine/lib/talons/Header/currencySwitcher.gql.js",
+          "line": 29
+        },
+        {
+          "name": "getCurrencyData",
+          "file": "packages/venia-ui/lib/components/Header/currencySwitcher.gql.js",
+          "line": 29
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "getStoreConfigForMiniCart",
+          "file": "packages/peregrine/lib/talons/MiniCart/miniCart.gql.js",
+          "line": 4
+        },
+        {
+          "name": "getStoreConfigForCartPage",
+          "file": "packages/peregrine/lib/talons/CartPage/ProductListing/product.gql.js",
+          "line": 4
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "getConfigurableThumbnailSource",
+          "file": "packages/peregrine/lib/talons/OrderHistoryPage/orderRow.gql.js",
+          "line": 4
+        },
+        {
+          "name": "getConfigurableThumbnailSource",
+          "file": "packages/peregrine/lib/talons/CheckoutPage/ItemsReview/itemsReview.gql.js",
+          "line": 6
+        },
+        {
+          "name": "getConfigurableThumbnailSource",
+          "file": "packages/peregrine/lib/talons/CartPage/ProductListing/EditModal/productForm.gql.js",
+          "line": 78
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "GetWishlistConfigForProductMOS",
+          "file": "packages/peregrine/lib/talons/ProductFullDetail/productFullDetail.gql.ce.js",
+          "line": 25
+        },
+        {
+          "name": "GetWishlistConfigForWishlistPageMOS",
+          "file": "packages/peregrine/lib/talons/WishlistPage/wishlistConfig.gql.ce.js",
+          "line": 4
+        },
+        {
+          "name": "GetWishlistConfigForCartPageMOS",
+          "file": "packages/peregrine/lib/talons/CartPage/ProductListing/productListing.gql.ce.js",
+          "line": 5
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "GetWishlistConfigForProductAC",
+          "file": "packages/peregrine/lib/talons/ProductFullDetail/productFullDetail.gql.ee.js",
+          "line": 6
+        },
+        {
+          "name": "GetWishlistConfigForCartPageAC",
+          "file": "packages/peregrine/lib/talons/CartPage/ProductListing/productListing.gql.ee.js",
+          "line": 5
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "GetCustomerWishlist",
+          "file": "packages/peregrine/lib/talons/WishlistPage/wishlist.gql.js",
+          "line": 7
+        },
+        {
+          "name": "GetCustomerWishlist",
+          "file": "packages/peregrine/lib/talons/WishlistPage/wishlistPage.gql.js",
+          "line": 6
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "getCartDetails",
+          "file": "packages/venia-ui/lib/components/LegacyMiniCart/cartOptions.js",
+          "line": 153
+        },
+        {
+          "name": "getCartDetails",
+          "file": "packages/venia-ui/lib/components/LegacyMiniCart/product.js",
+          "line": 130
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "getProductListing",
+          "file": "packages/peregrine/lib/talons/CartPage/ProductListing/productListing.gql.ce.js",
+          "line": 15
+        },
+        {
+          "name": "getProductListing",
+          "file": "packages/peregrine/lib/talons/CartPage/ProductListing/productListing.gql.ee.js",
+          "line": 16
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "getIsBillingAddressSame",
+          "file": "packages/peregrine/lib/talons/CheckoutPage/BillingAddress/billingAddress.gql.js",
+          "line": 7
+        },
+        {
+          "name": "getIsBillingAddressSame",
+          "file": "packages/peregrine/lib/talons/CheckoutPage/PaymentInformation/creditCard.gql.js",
+          "line": 7
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "getPaymentNonce",
+          "file": "packages/peregrine/lib/talons/CheckoutPage/PaymentInformation/creditCard.gql.js",
+          "line": 16
+        },
+        {
+          "name": "getPaymentNonce",
+          "file": "packages/peregrine/lib/talons/CheckoutPage/PaymentInformation/paymentInformation.gql.js",
+          "line": 42
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "GetCartDetails",
+          "file": "packages/peregrine/lib/talons/CartPage/cartPage.gql.js",
+          "line": 5
+        },
+        {
+          "name": "GetCartDetailsAfterSignIn",
+          "file": "packages/venia-ui/lib/components/SignIn/signIn.gql.js",
+          "line": 5
+        }
+      ],
+      "similarity": 0.96
+    }
+  ],
+  "duplicateFragments": [
+    {
+      "members": [
+        {
+          "name": "AvailableShippingMethodsCheckoutFragment",
+          "file": "packages/peregrine/lib/talons/CheckoutPage/ShippingMethod/shippingMethodFragments.gql.js",
+          "line": 9
+        },
+        {
+          "name": "AvailableShippingMethodsCartFragment",
+          "file": "packages/peregrine/lib/talons/CartPage/PriceAdjustments/ShippingMethods/shippingMethodsFragments.gql.js",
+          "line": 10
+        }
+      ],
+      "similarity": 1
+    }
+  ],
+  "complexity": [
+    {
+      "operation": "getCustomerWishlist",
+      "file": "packages/peregrine/lib/talons/WishlistPage/wishlist.gql.js",
+      "line": 20,
+      "depth": 9,
+      "nestedSelections": 18,
+      "fieldCount": 53,
+      "risk": "high"
+    },
+    {
+      "operation": "getProductDetailForProductPage",
+      "file": "packages/peregrine/lib/talons/RootComponents/Product/product.gql.js",
+      "line": 17,
+      "depth": 8,
+      "nestedSelections": 43,
+      "fieldCount": 123,
+      "risk": "high"
+    },
+    {
+      "operation": "SetShippingAddressForEstimate",
+      "file": "packages/peregrine/lib/talons/CartPage/PriceAdjustments/ShippingMethods/shippingMethods.gql.js",
+      "line": 17,
+      "depth": 8,
+      "nestedSelections": 37,
+      "fieldCount": 109,
+      "risk": "high"
+    },
+    {
+      "operation": "removeItem",
+      "file": "packages/venia-ui/lib/components/CartPage/ProductListing/product.js",
+      "line": 184,
+      "depth": 8,
+      "nestedSelections": 35,
+      "fieldCount": 94,
+      "risk": "high"
+    },
+    {
+      "operation": "updateItemQuantity",
+      "file": "packages/venia-ui/lib/components/CartPage/ProductListing/product.js",
+      "line": 200,
+      "depth": 8,
+      "nestedSelections": 35,
+      "fieldCount": 94,
+      "risk": "high"
+    },
+    {
+      "operation": "SetGiftOptionsOnCart",
+      "file": "packages/peregrine/lib/talons/CartPage/PriceAdjustments/GiftOptions/giftOptions.gql.js",
+      "line": 18,
+      "depth": 8,
+      "nestedSelections": 34,
+      "fieldCount": 91,
+      "risk": "high"
+    },
+    {
+      "operation": "SetShippingMethodForEstimate",
+      "file": "packages/venia-ui/lib/components/CartPage/PriceAdjustments/ShippingMethods/shippingRadios.js",
+      "line": 63,
+      "depth": 8,
+      "nestedSelections": 34,
+      "fieldCount": 90,
+      "risk": "high"
+    },
+    {
+      "operation": "RemoveItemForOptions",
+      "file": "packages/venia-ui/lib/components/LegacyMiniCart/cartOptions.gql.js",
+      "line": 5,
+      "depth": 8,
+      "nestedSelections": 34,
+      "fieldCount": 88,
+      "risk": "high"
+    },
+    {
+      "operation": "updateItemInCart",
+      "file": "packages/venia-ui/lib/components/LegacyMiniCart/cartOptions.gql.js",
+      "line": 24,
+      "depth": 8,
+      "nestedSelections": 34,
+      "fieldCount": 88,
+      "risk": "high"
+    },
+    {
+      "operation": "applyGiftCardToCart",
+      "file": "packages/peregrine/lib/talons/CartPage/GiftCards/giftCardQueries.gql.ee.js",
+      "line": 31,
+      "depth": 8,
+      "nestedSelections": 34,
+      "fieldCount": 88,
+      "risk": "high"
+    },
+    {
+      "operation": "removeGiftCard",
+      "file": "packages/peregrine/lib/talons/CartPage/GiftCards/giftCardQueries.gql.ee.js",
+      "line": 50,
+      "depth": 8,
+      "nestedSelections": 34,
+      "fieldCount": 88,
+      "risk": "high"
+    },
+    {
+      "operation": "applyCouponToCart",
+      "file": "packages/peregrine/lib/talons/CartPage/PriceAdjustments/CouponCode/couponCode.gql.js",
+      "line": 16,
+      "depth": 8,
+      "nestedSelections": 34,
+      "fieldCount": 88,
+      "risk": "high"
+    },
+    {
+      "operation": "removeCouponFromCart",
+      "file": "packages/peregrine/lib/talons/CartPage/PriceAdjustments/CouponCode/couponCode.gql.js",
+      "line": 35,
+      "depth": 8,
+      "nestedSelections": 34,
+      "fieldCount": 88,
+      "risk": "high"
+    },
+    {
+      "operation": "UpdateConfigurableOptions",
+      "file": "packages/peregrine/lib/talons/CartPage/ProductListing/EditModal/productForm.gql.js",
+      "line": 42,
+      "depth": 8,
+      "nestedSelections": 35,
+      "fieldCount": 88,
+      "risk": "high"
+    },
+    {
+      "operation": "RemoveItemForMiniCart",
+      "file": "packages/venia-ui/lib/components/MiniCart/miniCart.gql.js",
+      "line": 21,
+      "depth": 8,
+      "nestedSelections": 34,
+      "fieldCount": 87,
+      "risk": "high"
+    },
+    {
+      "operation": "UpdateCartItemQuantity",
+      "file": "packages/peregrine/lib/talons/CartPage/ProductListing/EditModal/productForm.gql.js",
+      "line": 19,
+      "depth": 8,
+      "nestedSelections": 33,
+      "fieldCount": 85,
+      "risk": "high"
+    },
+    {
+      "operation": "AddProductToCart",
+      "file": "packages/peregrine/lib/talons/ProductFullDetail/productFullDetail.gql.ce.js",
+      "line": 7,
+      "depth": 8,
+      "nestedSelections": 17,
+      "fieldCount": 44,
+      "risk": "high"
+    },
+    {
+      "operation": "AddProductToCartFromDialog",
+      "file": "packages/peregrine/lib/talons/AddToCartDialog/addToCartDialog.gql.js",
+      "line": 72,
+      "depth": 8,
+      "nestedSelections": 16,
+      "fieldCount": 41,
+      "risk": "high"
+    },
+    {
+      "operation": "addConfigurableProductToCart",
+      "file": "packages/peregrine/lib/talons/ProductFullDetail/productFullDetail.gql.ce.js",
+      "line": 38,
+      "depth": 8,
+      "nestedSelections": 16,
+      "fieldCount": 41,
+      "risk": "high"
+    },
+    {
+      "operation": "addSimpleProductToCart",
+      "file": "packages/peregrine/lib/talons/ProductFullDetail/productFullDetail.gql.ce.js",
+      "line": 72,
+      "depth": 8,
+      "nestedSelections": 16,
+      "fieldCount": 41,
+      "risk": "high"
+    },
+    {
+      "operation": "AddWishlistItemToCart",
+      "file": "packages/peregrine/lib/talons/WishlistPage/wishlistItem.gql.js",
+      "line": 8,
+      "depth": 8,
+      "nestedSelections": 16,
+      "fieldCount": 41,
+      "risk": "high"
+    },
+    {
+      "operation": "AddItemToCart",
+      "file": "packages/peregrine/lib/talons/Gallery/addToCart.gql.js",
+      "line": 5,
+      "depth": 8,
+      "nestedSelections": 16,
+      "fieldCount": 40,
+      "risk": "high"
+    },
+    {
+      "operation": "productDetailBySku",
+      "file": "packages/peregrine/lib/talons/CartPage/ProductListing/EditModal/productForm.gql.js",
+      "line": 6,
+      "depth": 8,
+      "nestedSelections": 14,
+      "fieldCount": 37,
+      "risk": "high"
+    },
+    {
+      "operation": "GetProductDetailForATCDialog",
+      "file": "packages/peregrine/lib/talons/AddToCartDialog/addToCartDialog.gql.js",
+      "line": 5,
+      "depth": 8,
+      "nestedSelections": 16,
+      "fieldCount": 36,
+      "risk": "high"
+    },
+    {
+      "operation": "GetCartDetailsAfterSignIn",
+      "file": "packages/venia-ui/lib/components/SignIn/signIn.gql.js",
+      "line": 5,
+      "depth": 7,
+      "nestedSelections": 35,
+      "fieldCount": 89,
+      "risk": "high"
+    },
+    {
+      "operation": "GetCartDetails",
+      "file": "packages/peregrine/lib/talons/CartPage/cartPage.gql.js",
+      "line": 5,
+      "depth": 7,
+      "nestedSelections": 32,
+      "fieldCount": 84,
+      "risk": "high"
+    },
+    {
+      "operation": "GetCustomerOrders",
+      "file": "packages/peregrine/lib/talons/OrderHistoryPage/orderHistoryPage.gql.js",
+      "line": 98,
+      "depth": 7,
+      "nestedSelections": 21,
+      "fieldCount": 72,
+      "risk": "high"
+    },
+    {
+      "operation": "getProductListing",
+      "file": "packages/peregrine/lib/talons/CartPage/ProductListing/productListing.gql.ce.js",
+      "line": 15,
+      "depth": 7,
+      "nestedSelections": 15,
+      "fieldCount": 43,
+      "risk": "high"
+    },
+    {
+      "operation": "getProductListing",
+      "file": "packages/peregrine/lib/talons/CartPage/ProductListing/productListing.gql.ee.js",
+      "line": 16,
+      "depth": 7,
+      "nestedSelections": 15,
+      "fieldCount": 43,
+      "risk": "high"
+    },
+    {
+      "operation": "MiniCartQuery",
+      "file": "packages/venia-ui/lib/components/MiniCart/miniCart.gql.js",
+      "line": 11,
+      "depth": 7,
+      "nestedSelections": 15,
+      "fieldCount": 39,
+      "risk": "high"
+    },
+    {
+      "operation": "GetCartDetailsAfterAccountCreation",
+      "file": "packages/peregrine/lib/talons/CreateAccount/createAccount.gql.js",
+      "line": 60,
+      "depth": 7,
+      "nestedSelections": 12,
+      "fieldCount": 28,
+      "risk": "medium"
+    },
+    {
+      "operation": "getCartDetails",
+      "file": "packages/venia-ui/lib/components/LegacyMiniCart/cartOptions.js",
+      "line": 153,
+      "depth": 7,
+      "nestedSelections": 12,
+      "fieldCount": 28,
+      "risk": "medium"
+    },
+    {
+      "operation": "getCartDetails",
+      "file": "packages/venia-ui/lib/components/LegacyMiniCart/product.js",
+      "line": 130,
+      "depth": 7,
+      "nestedSelections": 12,
+      "fieldCount": 28,
+      "risk": "medium"
+    },
+    {
+      "operation": "GetCartDetailsAfterCheckout",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/OrderConfirmationPage/createAccount.gql.js",
+      "line": 59,
+      "depth": 7,
+      "nestedSelections": 12,
+      "fieldCount": 28,
+      "risk": "medium"
+    },
+    {
+      "operation": "GetCategoryList",
+      "file": "packages/peregrine/lib/talons/CategoryList/categoryList.gql.js",
+      "line": 16,
+      "depth": 7,
+      "nestedSelections": 6,
+      "fieldCount": 16,
+      "risk": "medium"
+    },
+    {
+      "operation": "SetGuestShipping",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/ShippingInformation/AddressForm/guestForm.gql.js",
+      "line": 9,
+      "depth": 6,
+      "nestedSelections": 25,
+      "fieldCount": 72,
+      "risk": "high"
+    },
+    {
+      "operation": "SetCustomerAddressOnCart",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/ShippingInformation/shippingInformation.gql.js",
+      "line": 28,
+      "depth": 6,
+      "nestedSelections": 23,
+      "fieldCount": 69,
+      "risk": "high"
+    },
+    {
+      "operation": "SetShippingMethod",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/ShippingMethod/shippingMethod.gql.js",
+      "line": 30,
+      "depth": 6,
+      "nestedSelections": 23,
+      "fieldCount": 69,
+      "risk": "high"
+    },
+    {
+      "operation": "setBillingAddress",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/PaymentInformation/creditCard.gql.js",
+      "line": 73,
+      "depth": 6,
+      "nestedSelections": 22,
+      "fieldCount": 57,
+      "risk": "high"
+    },
+    {
+      "operation": "setBillingAddress",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/BillingAddress/billingAddress.gql.js",
+      "line": 60,
+      "depth": 6,
+      "nestedSelections": 22,
+      "fieldCount": 55,
+      "risk": "high"
+    },
+    {
+      "operation": "setBillingAddress",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/PaymentInformation/paymentInformation.gql.js",
+      "line": 51,
+      "depth": 6,
+      "nestedSelections": 22,
+      "fieldCount": 55,
+      "risk": "high"
+    },
+    {
+      "operation": "productDetailBySku",
+      "file": "packages/venia-ui/lib/components/LegacyMiniCart/editItem.js",
+      "line": 56,
+      "depth": 6,
+      "nestedSelections": 9,
+      "fieldCount": 36,
+      "risk": "medium"
+    },
+    {
+      "operation": "getAutocompleteResults",
+      "file": "packages/venia-ui/lib/components/SearchBar/autocomplete.js",
+      "line": 12,
+      "depth": 6,
+      "nestedSelections": 13,
+      "fieldCount": 33,
+      "risk": "medium"
+    },
+    {
+      "operation": "GetCategories",
+      "file": "packages/peregrine/lib/talons/RootComponents/Category/category.gql.js",
+      "line": 6,
+      "depth": 6,
+      "nestedSelections": 11,
+      "fieldCount": 33,
+      "risk": "medium"
+    },
+    {
+      "operation": "getProductsByUrlKey",
+      "file": "packages/pagebuilder/lib/ContentTypes/Products/products.js",
+      "line": 283,
+      "depth": 6,
+      "nestedSelections": 10,
+      "fieldCount": 29,
+      "risk": "medium"
+    },
+    {
+      "operation": "ProductSearch",
+      "file": "packages/peregrine/lib/talons/SearchPage/searchPage.gql.js",
+      "line": 41,
+      "depth": 6,
+      "nestedSelections": 9,
+      "fieldCount": 24,
+      "risk": "medium"
+    },
+    {
+      "operation": "GetProductThumbnailsByURLKey",
+      "file": "packages/peregrine/lib/talons/OrderHistoryPage/orderRow.gql.js",
+      "line": 14,
+      "depth": 6,
+      "nestedSelections": 6,
+      "fieldCount": 17,
+      "risk": "medium"
+    },
+    {
+      "operation": "GetWishlistItemsForLocalField",
+      "file": "packages/peregrine/lib/hooks/useCustomerWishlistSkus/customerWishlist.gql.ce.js",
+      "line": 5,
+      "depth": 6,
+      "nestedSelections": 6,
+      "fieldCount": 12,
+      "risk": "medium"
+    },
+    {
+      "operation": "getOrderDetails",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/checkoutPage.gql.js",
+      "line": 27,
+      "depth": 5,
+      "nestedSelections": 19,
+      "fieldCount": 54,
+      "risk": "high"
+    },
+    {
+      "operation": "getPriceSummary",
+      "file": "packages/peregrine/lib/talons/CartPage/PriceSummary/priceSummary.gql.js",
+      "line": 5,
+      "depth": 5,
+      "nestedSelections": 17,
+      "fieldCount": 40,
+      "risk": "high"
+    },
+    {
+      "operation": "getSelectedAndAvailableShippingMethods",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/ShippingMethod/shippingMethod.gql.js",
+      "line": 12,
+      "depth": 5,
+      "nestedSelections": 8,
+      "fieldCount": 33,
+      "risk": "medium"
+    },
+    {
+      "operation": "GetCart",
+      "file": "packages/extensions/venia-product-recommendations/lib/queries/getCart.gql.js",
+      "line": 50,
+      "depth": 5,
+      "nestedSelections": 11,
+      "fieldCount": 30,
+      "risk": "medium"
+    },
+    {
+      "operation": "getCheckoutDetails",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/checkoutPage.gql.js",
+      "line": 37,
+      "depth": 5,
+      "nestedSelections": 10,
+      "fieldCount": 28,
+      "risk": "medium"
+    },
+    {
+      "operation": "getItemsInCart",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/ItemsReview/itemsReview.gql.js",
+      "line": 16,
+      "depth": 5,
+      "nestedSelections": 9,
+      "fieldCount": 25,
+      "risk": "medium"
+    },
+    {
+      "operation": "getMegaMenu",
+      "file": "packages/peregrine/lib/talons/MegaMenu/megaMenu.gql.js",
+      "line": 13,
+      "depth": 5,
+      "nestedSelections": 4,
+      "fieldCount": 21,
+      "risk": "medium"
+    },
+    {
+      "operation": "GetShippingMethods",
+      "file": "packages/peregrine/lib/talons/CartPage/PriceAdjustments/ShippingMethods/shippingMethods.gql.js",
+      "line": 7,
+      "depth": 5,
+      "nestedSelections": 7,
+      "fieldCount": 21,
+      "risk": "medium"
+    },
+    {
+      "operation": "getOrderConfirmationDetails",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/OrderConfirmationPage/orderConfirmationPage.gql.js",
+      "line": 4,
+      "depth": 5,
+      "nestedSelections": 4,
+      "fieldCount": 14,
+      "risk": "medium"
+    },
+    {
+      "operation": "GetGiftOptions",
+      "file": "packages/peregrine/lib/talons/CartPage/PriceAdjustments/GiftOptions/giftOptions.gql.js",
+      "line": 7,
+      "depth": 5,
+      "nestedSelections": 5,
+      "fieldCount": 14,
+      "risk": "medium"
+    },
+    {
+      "operation": "setShippingAddress",
+      "file": "packages/venia-ui/lib/components/Checkout/addressForm.js",
+      "line": 197,
+      "depth": 5,
+      "nestedSelections": 4,
+      "fieldCount": 9,
+      "risk": "medium"
+    },
+    {
+      "operation": "SalesRulesDataQuery",
+      "file": "packages/peregrine/lib/talons/CmsDynamicBlock/cmsDynamicBlock.gql.js",
+      "line": 32,
+      "depth": 4,
+      "nestedSelections": 12,
+      "fieldCount": 29,
+      "risk": "medium"
+    },
+    {
+      "operation": "GetCustomerAddressesForAddressBook",
+      "file": "packages/peregrine/lib/talons/AddressBookPage/addressBookPage.gql.js",
+      "line": 6,
+      "depth": 4,
+      "nestedSelections": 4,
+      "fieldCount": 21,
+      "risk": "low"
+    },
+    {
+      "operation": "getPaymentInformation",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/PaymentInformation/paymentInformation.gql.js",
+      "line": 15,
+      "depth": 4,
+      "nestedSelections": 6,
+      "fieldCount": 18,
+      "risk": "low"
+    },
+    {
+      "operation": "GetCustomerCartAddress",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/AddressBook/addressBook.gql.js",
+      "line": 21,
+      "depth": 4,
+      "nestedSelections": 4,
+      "fieldCount": 17,
+      "risk": "low"
+    },
+    {
+      "operation": "GetShippingInformation",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/ShippingInformation/shippingInformation.gql.js",
+      "line": 9,
+      "depth": 4,
+      "nestedSelections": 4,
+      "fieldCount": 17,
+      "risk": "low"
+    },
+    {
+      "operation": "GetNavigationMenu",
+      "file": "packages/peregrine/lib/talons/CategoryTree/categoryTree.gql.js",
+      "line": 14,
+      "depth": 4,
+      "nestedSelections": 3,
+      "fieldCount": 15,
+      "risk": "low"
+    },
+    {
+      "operation": "GetCustomerAddresses",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/AddressBook/addressBook.gql.js",
+      "line": 8,
+      "depth": 4,
+      "nestedSelections": 3,
+      "fieldCount": 15,
+      "risk": "low"
+    },
+    {
+      "operation": "getSummaryData",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/PaymentInformation/braintreeSummary.gql.js",
+      "line": 4,
+      "depth": 4,
+      "nestedSelections": 4,
+      "fieldCount": 15,
+      "risk": "low"
+    },
+    {
+      "operation": "getBillingAddress",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/PaymentInformation/creditCard.gql.js",
+      "line": 25,
+      "depth": 4,
+      "nestedSelections": 4,
+      "fieldCount": 15,
+      "risk": "low"
+    },
+    {
+      "operation": "getSelectedShippingAddress",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/PaymentInformation/creditCard.gql.js",
+      "line": 49,
+      "depth": 4,
+      "nestedSelections": 4,
+      "fieldCount": 15,
+      "risk": "low"
+    },
+    {
+      "operation": "getBillingAddress",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/BillingAddress/billingAddress.gql.js",
+      "line": 16,
+      "depth": 4,
+      "nestedSelections": 4,
+      "fieldCount": 13,
+      "risk": "low"
+    },
+    {
+      "operation": "getSelectedShippingAddress",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/BillingAddress/billingAddress.gql.js",
+      "line": 38,
+      "depth": 4,
+      "nestedSelections": 4,
+      "fieldCount": 13,
+      "risk": "low"
+    },
+    {
+      "operation": "GetBreadcrumbs",
+      "file": "packages/peregrine/lib/talons/Breadcrumbs/breadcrumbs.gql.js",
+      "line": 14,
+      "depth": 4,
+      "nestedSelections": 3,
+      "fieldCount": 10,
+      "risk": "low"
+    },
+    {
+      "operation": "MergeCartsAfterAccountCreation",
+      "file": "packages/peregrine/lib/talons/CreateAccount/createAccount.gql.js",
+      "line": 111,
+      "depth": 4,
+      "nestedSelections": 4,
+      "fieldCount": 10,
+      "risk": "low"
+    },
+    {
+      "operation": "MergeCartsAfterSignIn",
+      "file": "packages/peregrine/lib/talons/SignIn/signIn.gql.js",
+      "line": 32,
+      "depth": 4,
+      "nestedSelections": 4,
+      "fieldCount": 10,
+      "risk": "low"
+    },
+    {
+      "operation": "getCategoryData",
+      "file": "packages/peregrine/lib/talons/RootComponents/Category/categoryContent.gql.js",
+      "line": 23,
+      "depth": 4,
+      "nestedSelections": 3,
+      "fieldCount": 10,
+      "risk": "low"
+    },
+    {
+      "operation": "getProductFiltersBySearch",
+      "file": "packages/peregrine/lib/talons/SearchPage/searchPage.gql.js",
+      "line": 14,
+      "depth": 4,
+      "nestedSelections": 3,
+      "fieldCount": 9,
+      "risk": "low"
+    },
+    {
+      "operation": "getProductFiltersByCategories",
+      "file": "packages/peregrine/lib/talons/RootComponents/Category/categoryContent.gql.js",
+      "line": 4,
+      "depth": 4,
+      "nestedSelections": 3,
+      "fieldCount": 9,
+      "risk": "low"
+    },
+    {
+      "operation": "getAppliedGiftCards",
+      "file": "packages/peregrine/lib/talons/CartPage/GiftCards/giftCardQueries.gql.ee.js",
+      "line": 7,
+      "depth": 4,
+      "nestedSelections": 3,
+      "fieldCount": 8,
+      "risk": "low"
+    },
+    {
+      "operation": "DeleteCreditCardPayment",
+      "file": "packages/peregrine/lib/talons/SavedPaymentsPage/creditCard.gql.js",
+      "line": 6,
+      "depth": 4,
+      "nestedSelections": 3,
+      "fieldCount": 7,
+      "risk": "low"
+    },
+    {
+      "operation": "(anonymous)",
+      "file": "packages/pwa-buildpack/lib/queries/getSchemaTypes.graphql",
+      "line": 2,
+      "depth": 4,
+      "nestedSelections": 3,
+      "fieldCount": 6,
+      "risk": "low"
+    },
+    {
+      "operation": "setPaymentMethodOnCart",
+      "file": "packages/extensions/venia-sample-payments-cashondelivery/src/talons/cashondelivery.gql.js",
+      "line": 4,
+      "depth": 4,
+      "nestedSelections": 3,
+      "fieldCount": 6,
+      "risk": "low"
+    },
+    {
+      "operation": "setPaymentMethodOnCart",
+      "file": "packages/extensions/venia-sample-payments-checkmo/src/talons/checkmo.gql.js",
+      "line": 15,
+      "depth": 4,
+      "nestedSelections": 3,
+      "fieldCount": 6,
+      "risk": "low"
+    },
+    {
+      "operation": "GetCmsDynamicBlocks",
+      "file": "packages/peregrine/lib/talons/CmsDynamicBlock/cmsDynamicBlock.gql.js",
+      "line": 4,
+      "depth": 4,
+      "nestedSelections": 3,
+      "fieldCount": 6,
+      "risk": "low"
+    },
+    {
+      "operation": "setSelectedPaymentMethod",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/PaymentInformation/creditCard.gql.js",
+      "line": 131,
+      "depth": 4,
+      "nestedSelections": 3,
+      "fieldCount": 6,
+      "risk": "low"
+    },
+    {
+      "operation": "setPaymentMethodOnCart",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/PaymentInformation/paymentInformation.gql.js",
+      "line": 107,
+      "depth": 4,
+      "nestedSelections": 3,
+      "fieldCount": 6,
+      "risk": "low"
+    },
+    {
+      "operation": "setPaymentMethodOnCart",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/PaymentInformation/paymentMethods.gql.js",
+      "line": 19,
+      "depth": 4,
+      "nestedSelections": 3,
+      "fieldCount": 6,
+      "risk": "low"
+    },
+    {
+      "operation": "GetFilterInputsForModal",
+      "file": "packages/peregrine/lib/talons/FilterModal/filterModal.gql.js",
+      "line": 4,
+      "depth": 4,
+      "nestedSelections": 3,
+      "fieldCount": 5,
+      "risk": "low"
+    },
+    {
+      "operation": "GetFilterInputsForSearch",
+      "file": "packages/peregrine/lib/talons/SearchPage/searchPage.gql.js",
+      "line": 91,
+      "depth": 4,
+      "nestedSelections": 3,
+      "fieldCount": 5,
+      "risk": "low"
+    },
+    {
+      "operation": "getSearchAvailableSortMethods",
+      "file": "packages/peregrine/lib/talons/SearchPage/searchPage.gql.js",
+      "line": 104,
+      "depth": 4,
+      "nestedSelections": 3,
+      "fieldCount": 5,
+      "risk": "low"
+    },
+    {
+      "operation": "GetFilterInputsForCategory",
+      "file": "packages/peregrine/lib/talons/RootComponents/Category/category.gql.js",
+      "line": 34,
+      "depth": 4,
+      "nestedSelections": 3,
+      "fieldCount": 5,
+      "risk": "low"
+    },
+    {
+      "operation": "getCategoriesAvailableSortMethods",
+      "file": "packages/peregrine/lib/talons/RootComponents/Category/categoryContent.gql.js",
+      "line": 42,
+      "depth": 4,
+      "nestedSelections": 3,
+      "fieldCount": 5,
+      "risk": "low"
+    },
+    {
+      "operation": "UpdateCustomerAddressInAddressBook",
+      "file": "packages/peregrine/lib/talons/AddressBookPage/addressBookPage.gql.js",
+      "line": 36,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 17,
+      "risk": "low"
+    },
+    {
+      "operation": "CreateCustomerAddress",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/ShippingInformation/AddressForm/customerForm.gql.js",
+      "line": 8,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 14,
+      "risk": "low"
+    },
+    {
+      "operation": "getWishlistsDialogData",
+      "file": "packages/peregrine/lib/talons/Wishlist/WishlistDialog/wishlistDialog.gql.js",
+      "line": 25,
+      "depth": 3,
+      "nestedSelections": 3,
+      "fieldCount": 8,
+      "risk": "low"
+    },
+    {
+      "operation": "GetCustomerWishlist",
+      "file": "packages/peregrine/lib/talons/WishlistPage/wishlist.gql.js",
+      "line": 7,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 7,
+      "risk": "low"
+    },
+    {
+      "operation": "RemoveProductsFromWishlist",
+      "file": "packages/peregrine/lib/talons/WishlistPage/wishlistItem.gql.js",
+      "line": 25,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 7,
+      "risk": "low"
+    },
+    {
+      "operation": "GetCustomerWishlist",
+      "file": "packages/peregrine/lib/talons/WishlistPage/wishlistPage.gql.js",
+      "line": 6,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 7,
+      "risk": "low"
+    },
+    {
+      "operation": "getGiftCardBalance",
+      "file": "packages/peregrine/lib/talons/CartPage/GiftCards/giftCardQueries.gql.ee.js",
+      "line": 17,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 7,
+      "risk": "low"
+    },
+    {
+      "operation": "getPaymentMethods",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/PaymentInformation/paymentMethods.gql.js",
+      "line": 4,
+      "depth": 3,
+      "nestedSelections": 3,
+      "fieldCount": 7,
+      "risk": "low"
+    },
+    {
+      "operation": "addProductToWishlist",
+      "file": "packages/peregrine/lib/talons/Wishlist/WishlistDialog/wishlistDialog.gql.js",
+      "line": 4,
+      "depth": 3,
+      "nestedSelections": 3,
+      "fieldCount": 7,
+      "risk": "low"
+    },
+    {
+      "operation": "SetCustomerInformation",
+      "file": "packages/venia-ui/lib/components/AccountInformationPage/accountInformationPage.gql.js",
+      "line": 5,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 6,
+      "risk": "low"
+    },
+    {
+      "operation": "getAllCountries",
+      "file": "packages/venia-ui/lib/components/Checkout/form.js",
+      "line": 74,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 6,
+      "risk": "low"
+    },
+    {
+      "operation": "GetRegions",
+      "file": "packages/venia-ui/lib/components/Region/region.gql.js",
+      "line": 4,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 6,
+      "risk": "low"
+    },
+    {
+      "operation": "GetSavedPayments",
+      "file": "packages/peregrine/lib/talons/SavedPaymentsPage/savedPaymentsPage.gql.js",
+      "line": 14,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 5,
+      "risk": "low"
+    },
+    {
+      "operation": "getSummaryData",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/PaymentInformation/summary.gql.js",
+      "line": 4,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 5,
+      "risk": "low"
+    },
+    {
+      "operation": "getProductDetailForProductPage",
+      "file": "packages/peregrine/lib/talons/CmsDynamicBlock/cmsDynamicBlock.gql.js",
+      "line": 98,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 4,
+      "risk": "low"
+    },
+    {
+      "operation": "GetContactPageCmsBlocks",
+      "file": "packages/peregrine/lib/talons/ContactPage/contactUs.gql.js",
+      "line": 34,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 4,
+      "risk": "low"
+    },
+    {
+      "operation": "CreateAccount",
+      "file": "packages/peregrine/lib/talons/CreateAccount/createAccount.gql.js",
+      "line": 5,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 4,
+      "risk": "low"
+    },
+    {
+      "operation": "cmsBlocks",
+      "file": "packages/venia-ui/lib/components/CmsBlock/cmsBlock.js",
+      "line": 75,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 4,
+      "risk": "low"
+    },
+    {
+      "operation": "getSelectedPaymentMethod",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/PaymentInformation/editModal.gql.js",
+      "line": 4,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 4,
+      "risk": "low"
+    },
+    {
+      "operation": "AddProductToWishlistFromGallery",
+      "file": "packages/peregrine/lib/talons/Wishlist/AddToListButton/addToListButton.gql.js",
+      "line": 4,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 4,
+      "risk": "low"
+    },
+    {
+      "operation": "getAppliedCoupons",
+      "file": "packages/peregrine/lib/talons/CartPage/PriceAdjustments/CouponCode/couponCode.gql.js",
+      "line": 6,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 4,
+      "risk": "low"
+    },
+    {
+      "operation": "placeOrder",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/checkoutPage.gql.js",
+      "line": 15,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "SetNewsletterSubscription",
+      "file": "packages/peregrine/lib/talons/CommunicationsPage/communicationsPage.gql.js",
+      "line": 4,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "createWishlist",
+      "file": "packages/peregrine/lib/talons/WishlistPage/createWishlist.gql.js",
+      "line": 4,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "setGuestEmailOnCart",
+      "file": "packages/venia-ui/lib/components/Checkout/addressForm.js",
+      "line": 187,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "CreateAccountAfterCheckout",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/OrderConfirmationPage/createAccount.gql.js",
+      "line": 5,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "createWishlist",
+      "file": "packages/peregrine/lib/talons/Wishlist/WishlistDialog/CreateWishlistForm/createWishlistForm.gql.js",
+      "line": 5,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "GetStoreConfigForLiveSearchPLP",
+      "file": "packages/extensions/venia-pwa-live-search/src/queries/liveSearchPlpConfigs.gql.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 2,
+      "fieldCount": 20,
+      "risk": "low"
+    },
+    {
+      "operation": "experiencePlatformConnectorContext",
+      "file": "packages/extensions/experience-platform-connector/src/queries/getExtensionContext.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 2,
+      "fieldCount": 19,
+      "risk": "low"
+    },
+    {
+      "operation": "GetStoreConfigForLiveSearchPopover",
+      "file": "packages/extensions/venia-pwa-live-search/src/queries/liveSearchPopoverConfigs.gql.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 2,
+      "fieldCount": 18,
+      "risk": "low"
+    },
+    {
+      "operation": "storefrontContext",
+      "file": "packages/extensions/venia-pwa-live-search/src/queries/eventing/getStorefrontContext.gql.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 16,
+      "risk": "low"
+    },
+    {
+      "operation": "GetCmsPage",
+      "file": "packages/peregrine/lib/talons/Cms/cmsPage.gql.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 9,
+      "risk": "low"
+    },
+    {
+      "operation": "getAvailableStoresData",
+      "file": "packages/peregrine/lib/talons/Header/storeSwitcher.gql.js",
+      "line": 23,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 9,
+      "risk": "low"
+    },
+    {
+      "operation": "(anonymous)",
+      "file": "packages/pwa-buildpack/lib/queries/getStoreConfigData.graphql",
+      "line": 2,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 7,
+      "risk": "low"
+    },
+    {
+      "operation": "ResolveURL",
+      "file": "packages/peregrine/lib/talons/MagentoRoute/magentoRoute.gql.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 7,
+      "risk": "low"
+    },
+    {
+      "operation": "availableStoresConfigData",
+      "file": "packages/pwa-buildpack/lib/queries/getAvailableStoresConfigData.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 6,
+      "risk": "low"
+    },
+    {
+      "operation": "GetReCaptchaV3Config",
+      "file": "packages/peregrine/lib/hooks/useGoogleReCaptcha/googleReCaptchaConfig.gql.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 5,
+      "risk": "low"
+    },
+    {
+      "operation": "GetCustomerAfterCreate",
+      "file": "packages/peregrine/lib/talons/CreateAccount/createAccount.gql.js",
+      "line": 34,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 5,
+      "risk": "low"
+    },
+    {
+      "operation": "GetStoreConfigDataForGalleryAC",
+      "file": "packages/peregrine/lib/talons/Gallery/gallery.gql.ee.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 5,
+      "risk": "low"
+    },
+    {
+      "operation": "GetCustomerForLeftNav",
+      "file": "packages/peregrine/lib/talons/Navigation/navigation.gql.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 5,
+      "risk": "low"
+    },
+    {
+      "operation": "GetCustomerAfterSignIn",
+      "file": "packages/peregrine/lib/talons/SignIn/signIn.gql.js",
+      "line": 6,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 5,
+      "risk": "low"
+    },
+    {
+      "operation": "GetWishlistConfigForWishlistPageAC",
+      "file": "packages/peregrine/lib/talons/WishlistPage/wishlistConfig.gql.ee.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 5,
+      "risk": "low"
+    },
+    {
+      "operation": "GetCustomerInformation",
+      "file": "packages/venia-ui/lib/components/AccountInformationPage/accountInformationPage.gql.js",
+      "line": 31,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 5,
+      "risk": "low"
+    },
+    {
+      "operation": "getPageSize",
+      "file": "packages/venia-ui/lib/RootComponents/Category/category.gql.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 5,
+      "risk": "low"
+    },
+    {
+      "operation": "GetStoreConfigForCarouselAC",
+      "file": "packages/pagebuilder/lib/ContentTypes/Products/Carousel/carousel.gql.ee.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 5,
+      "risk": "low"
+    },
+    {
+      "operation": "GetStoreConfigForGiftOptions",
+      "file": "packages/peregrine/lib/talons/CartPage/PriceAdjustments/giftOptionsSection.gql.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 5,
+      "risk": "low"
+    },
+    {
+      "operation": "GetCustomerAfterCheckout",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/OrderConfirmationPage/createAccount.gql.js",
+      "line": 33,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 5,
+      "risk": "low"
+    },
+    {
+      "operation": "GetCustomer",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/ShippingInformation/AddressForm/customerForm.gql.js",
+      "line": 36,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 5,
+      "risk": "low"
+    },
+    {
+      "operation": "storeConfigData",
+      "file": "packages/extensions/venia-sample-payments-checkmo/src/talons/checkmo.gql.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 4,
+      "risk": "low"
+    },
+    {
+      "operation": "GetStoreConfigData",
+      "file": "packages/peregrine/lib/talons/CreateAccount/createAccount.gql.js",
+      "line": 130,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 4,
+      "risk": "low"
+    },
+    {
+      "operation": "GetStoreConfigDataForGalleryMOS",
+      "file": "packages/peregrine/lib/talons/Gallery/gallery.gql.ce.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 4,
+      "risk": "low"
+    },
+    {
+      "operation": "getCurrencyData",
+      "file": "packages/peregrine/lib/talons/Header/currencySwitcher.gql.js",
+      "line": 29,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 4,
+      "risk": "low"
+    },
+    {
+      "operation": "getStoreConfigData",
+      "file": "packages/peregrine/lib/talons/Header/storeSwitcher.gql.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 4,
+      "risk": "low"
+    },
+    {
+      "operation": "getStoreConfigForMiniCart",
+      "file": "packages/peregrine/lib/talons/MiniCart/miniCart.gql.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 4,
+      "risk": "low"
+    },
+    {
+      "operation": "GetWishlistConfigForProductAC",
+      "file": "packages/peregrine/lib/talons/ProductFullDetail/productFullDetail.gql.ee.js",
+      "line": 6,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 4,
+      "risk": "low"
+    },
+    {
+      "operation": "getSearchTermData",
+      "file": "packages/peregrine/lib/talons/SearchPage/searchPage.gql.js",
+      "line": 31,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 4,
+      "risk": "low"
+    },
+    {
+      "operation": "getMultipleWishlistsEnabled",
+      "file": "packages/peregrine/lib/talons/WishlistPage/createWishlist.gql.js",
+      "line": 14,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 4,
+      "risk": "low"
+    },
+    {
+      "operation": "UpdateWishlist",
+      "file": "packages/peregrine/lib/talons/WishlistPage/wishlist.gql.js",
+      "line": 38,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 4,
+      "risk": "low"
+    },
+    {
+      "operation": "GetCountries",
+      "file": "packages/venia-ui/lib/components/Country/country.gql.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 4,
+      "risk": "low"
+    },
+    {
+      "operation": "getItemCount",
+      "file": "packages/venia-ui/lib/components/Header/cartTrigger.gql.js",
+      "line": 6,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 4,
+      "risk": "low"
+    },
+    {
+      "operation": "getCurrencyData",
+      "file": "packages/venia-ui/lib/components/Header/currencySwitcher.gql.js",
+      "line": 29,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 4,
+      "risk": "low"
+    },
+    {
+      "operation": "GetStoreConfigForCarouselMOS",
+      "file": "packages/pagebuilder/lib/ContentTypes/Products/Carousel/carousel.gql.ce.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 4,
+      "risk": "low"
+    },
+    {
+      "operation": "getStoreConfigForCartPage",
+      "file": "packages/peregrine/lib/talons/CartPage/ProductListing/product.gql.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 4,
+      "risk": "low"
+    },
+    {
+      "operation": "GetWishlistConfigForCartPageAC",
+      "file": "packages/peregrine/lib/talons/CartPage/ProductListing/productListing.gql.ee.js",
+      "line": 5,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 4,
+      "risk": "low"
+    },
+    {
+      "operation": "getStoreConfigData",
+      "file": "packages/peregrine/lib/talons/RootComponents/Product/product.gql.js",
+      "line": 6,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 4,
+      "risk": "low"
+    },
+    {
+      "operation": "(anonymous)",
+      "file": "packages/pwa-buildpack/lib/queries/getStoreMediaUrl.graphql",
+      "line": 2,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "GetCustomerForLiveSearch",
+      "file": "packages/extensions/venia-pwa-live-search/src/queries/customerGroupCode.gql.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "getStoreConfigData",
+      "file": "packages/pagebuilder/lib/ContentTypes/Products/products.js",
+      "line": 327,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "GetStoreConfigForBreadcrumbs",
+      "file": "packages/peregrine/lib/talons/Breadcrumbs/breadcrumbs.gql.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "GetStoreConfigForCategoryList",
+      "file": "packages/peregrine/lib/talons/CategoryList/categoryList.gql.js",
+      "line": 6,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "GetStoreConfigForCategoryTree",
+      "file": "packages/peregrine/lib/talons/CategoryTree/categoryTree.gql.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "GetCustomerForCheckout",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/checkoutPage.gql.js",
+      "line": 49,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "getStoreConfigData",
+      "file": "packages/peregrine/lib/talons/CmsDynamicBlock/cmsDynamicBlock.gql.js",
+      "line": 88,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "GetStoreConfigForContactUs",
+      "file": "packages/peregrine/lib/talons/ContactPage/contactUs.gql.js",
+      "line": 24,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "storeConfigData",
+      "file": "packages/peregrine/lib/talons/Footer/footer.gql.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "GetStoreConfigForMegaMenu",
+      "file": "packages/peregrine/lib/talons/MegaMenu/megaMenu.gql.js",
+      "line": 3,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "getRootCategoryId",
+      "file": "packages/peregrine/lib/talons/Navigation/navigation.gql.js",
+      "line": 16,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "GetStoreConfigForNewsletter",
+      "file": "packages/peregrine/lib/talons/Newsletter/newsletter.gql.js",
+      "line": 12,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "GetProductURLSuffix",
+      "file": "packages/peregrine/lib/talons/OrderHistoryPage/orderHistoryContext.gql.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "getConfigurableThumbnailSource",
+      "file": "packages/peregrine/lib/talons/OrderHistoryPage/orderRow.gql.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "GetWishlistConfigForProductMOS",
+      "file": "packages/peregrine/lib/talons/ProductFullDetail/productFullDetail.gql.ce.js",
+      "line": 25,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "getPageSize",
+      "file": "packages/peregrine/lib/talons/SearchPage/searchPage.gql.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "GetWishlistConfigForWishlistPageMOS",
+      "file": "packages/peregrine/lib/talons/WishlistPage/wishlistConfig.gql.ce.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "getLocale",
+      "file": "packages/venia-ui/lib/components/App/localeProvider.js",
+      "line": 7,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "getStoreName",
+      "file": "packages/venia-ui/lib/components/Head/index.js",
+      "line": 44,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "GetRobotsConfig",
+      "file": "packages/venia-ui/lib/components/RobotsMeta/robotsMeta.gql.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "ResolveURL",
+      "file": "packages/extensions/venia-pwa-live-search/src/queries/eventing/getPageType.gql.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "GetWishlistConfigForCartPageMOS",
+      "file": "packages/peregrine/lib/talons/CartPage/ProductListing/productListing.gql.ce.js",
+      "line": 5,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "getIsBillingAddressSame",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/BillingAddress/billingAddress.gql.js",
+      "line": 7,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "getConfigurableThumbnailSource",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/ItemsReview/itemsReview.gql.js",
+      "line": 6,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "getIsBillingAddressSame",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/PaymentInformation/creditCard.gql.js",
+      "line": 7,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "getPaymentNonce",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/PaymentInformation/creditCard.gql.js",
+      "line": 16,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "getPaymentNonce",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/PaymentInformation/paymentInformation.gql.js",
+      "line": 42,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "getConfigurableThumbnailSource",
+      "file": "packages/peregrine/lib/talons/CartPage/ProductListing/EditModal/productForm.gql.js",
+      "line": 78,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "AddNewCustomerAddressToAddressBook",
+      "file": "packages/peregrine/lib/talons/AddressBookPage/addressBookPage.gql.js",
+      "line": 23,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 2,
+      "risk": "low"
+    },
+    {
+      "operation": "checkUserIsAuthed",
+      "file": "packages/peregrine/lib/talons/AddToCartDialog/useAddToCartDialog.js",
+      "line": 45,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 2,
+      "risk": "low"
+    },
+    {
+      "operation": "SignOutFromModal",
+      "file": "packages/peregrine/lib/talons/AuthModal/authModal.gql.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 2,
+      "risk": "low"
+    },
+    {
+      "operation": "GetCustomerSubscription",
+      "file": "packages/peregrine/lib/talons/CommunicationsPage/communicationsPage.gql.js",
+      "line": 15,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 2,
+      "risk": "low"
+    },
+    {
+      "operation": "SubmitContactForm",
+      "file": "packages/peregrine/lib/talons/ContactPage/contactUs.gql.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 2,
+      "risk": "low"
+    },
+    {
+      "operation": "SignInAfterCreate",
+      "file": "packages/peregrine/lib/talons/CreateAccount/createAccount.gql.js",
+      "line": 46,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 2,
+      "risk": "low"
+    },
+    {
+      "operation": "checkUserIsAuthed",
+      "file": "packages/peregrine/lib/talons/Gallery/useAddToCartButton.js",
+      "line": 41,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 2,
+      "risk": "low"
+    },
+    {
+      "operation": "SignOutFromMenu",
+      "file": "packages/peregrine/lib/talons/Header/accountMenu.gql.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 2,
+      "risk": "low"
+    },
+    {
+      "operation": "getRouteData",
+      "file": "packages/peregrine/lib/talons/Header/storeSwitcher.gql.js",
+      "line": 15,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 2,
+      "risk": "low"
+    },
+    {
+      "operation": "SubscribeToNewsletter",
+      "file": "packages/peregrine/lib/talons/Newsletter/newsletter.gql.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 2,
+      "risk": "low"
+    },
+    {
+      "operation": "checkUserIsAuthed",
+      "file": "packages/peregrine/lib/talons/ProductFullDetail/useProductFullDetail.js",
+      "line": 470,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 2,
+      "risk": "low"
+    },
+    {
+      "operation": "SignIn",
+      "file": "packages/peregrine/lib/talons/SignIn/signIn.gql.js",
+      "line": 18,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 2,
+      "risk": "low"
+    },
+    {
+      "operation": "getCart",
+      "file": "packages/peregrine/lib/talons/WishlistPage/useWishlistItem.js",
+      "line": 30,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 2,
+      "risk": "low"
+    },
+    {
+      "operation": "accountChipQuery",
+      "file": "packages/venia-ui/lib/components/AccountChip/accountChip.gql.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 2,
+      "risk": "low"
+    },
+    {
+      "operation": "ChangeCustomerPassword",
+      "file": "packages/venia-ui/lib/components/AccountInformationPage/accountInformationPage.gql.js",
+      "line": 17,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 2,
+      "risk": "low"
+    },
+    {
+      "operation": "magentoExtensionContext",
+      "file": "packages/extensions/venia-pwa-live-search/src/queries/eventing/getMagentoExtensionContext.gql.js",
+      "line": 4,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 2,
+      "risk": "low"
+    },
+    {
+      "operation": "SignInAfterCheckout",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/OrderConfirmationPage/createAccount.gql.js",
+      "line": 45,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 2,
+      "risk": "low"
+    },
+    {
+      "operation": "GetDefaultShipping",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/ShippingInformation/shippingInformation.gql.js",
+      "line": 19,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 2,
+      "risk": "low"
+    },
+    {
+      "operation": "UpdateCustomerAddress",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/ShippingInformation/AddressForm/customerForm.gql.js",
+      "line": 25,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 2,
+      "risk": "low"
+    },
+    {
+      "operation": "IsEmailAvailable",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/ShippingInformation/AddressForm/guestForm.gql.js",
+      "line": 42,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 2,
+      "risk": "low"
+    },
+    {
+      "operation": "GET_BRAINTREE_CLIENT_TOKEN",
+      "file": "packages/extensions/plugin-braintree-three-d-secure/Queries/createBraintreeClientToken.gql.js",
+      "line": 7,
+      "depth": 1,
+      "nestedSelections": 0,
+      "fieldCount": 1,
+      "risk": "low"
+    },
+    {
+      "operation": "DeleteCustomerAddressFromAddressBook",
+      "file": "packages/peregrine/lib/talons/AddressBookPage/addressBookPage.gql.js",
+      "line": 49,
+      "depth": 1,
+      "nestedSelections": 0,
+      "fieldCount": 1,
+      "risk": "low"
+    },
+    {
+      "operation": "createCart",
+      "file": "packages/peregrine/lib/talons/AddToCartDialog/useAddToCartDialog.js",
+      "line": 39,
+      "depth": 1,
+      "nestedSelections": 0,
+      "fieldCount": 1,
+      "risk": "low"
+    },
+    {
+      "operation": "createCart",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/checkoutPage.gql.js",
+      "line": 9,
+      "depth": 1,
+      "nestedSelections": 0,
+      "fieldCount": 1,
+      "risk": "low"
+    },
+    {
+      "operation": "CreateCartAfterAccountCreation",
+      "file": "packages/peregrine/lib/talons/CreateAccount/createAccount.gql.js",
+      "line": 54,
+      "depth": 1,
+      "nestedSelections": 0,
+      "fieldCount": 1,
+      "risk": "low"
+    },
+    {
+      "operation": "createCart",
+      "file": "packages/peregrine/lib/talons/Gallery/useAddToCartButton.js",
+      "line": 35,
+      "depth": 1,
+      "nestedSelections": 0,
+      "fieldCount": 1,
+      "risk": "low"
+    },
+    {
+      "operation": "createCart",
+      "file": "packages/peregrine/lib/talons/ProductFullDetail/useProductFullDetail.js",
+      "line": 464,
+      "depth": 1,
+      "nestedSelections": 0,
+      "fieldCount": 1,
+      "risk": "low"
+    },
+    {
+      "operation": "CreateCartAfterSignIn",
+      "file": "packages/peregrine/lib/talons/SignIn/signIn.gql.js",
+      "line": 26,
+      "depth": 1,
+      "nestedSelections": 0,
+      "fieldCount": 1,
+      "risk": "low"
+    },
+    {
+      "operation": "createCart",
+      "file": "packages/peregrine/lib/talons/WishlistPage/useWishlistItem.js",
+      "line": 24,
+      "depth": 1,
+      "nestedSelections": 0,
+      "fieldCount": 1,
+      "risk": "low"
+    },
+    {
+      "operation": "createCart",
+      "file": "packages/venia-ui/lib/components/Checkout/flow.js",
+      "line": 130,
+      "depth": 1,
+      "nestedSelections": 0,
+      "fieldCount": 1,
+      "risk": "low"
+    },
+    {
+      "operation": "requestPasswordResetEmail",
+      "file": "packages/venia-ui/lib/components/ForgotPassword/forgotPassword.gql.js",
+      "line": 4,
+      "depth": 1,
+      "nestedSelections": 0,
+      "fieldCount": 1,
+      "risk": "low"
+    },
+    {
+      "operation": "CreateCartWithCartOptions",
+      "file": "packages/venia-ui/lib/components/LegacyMiniCart/cartOptions.js",
+      "line": 147,
+      "depth": 1,
+      "nestedSelections": 0,
+      "fieldCount": 1,
+      "risk": "low"
+    },
+    {
+      "operation": "CreateCartWithProduct",
+      "file": "packages/venia-ui/lib/components/LegacyMiniCart/product.js",
+      "line": 124,
+      "depth": 1,
+      "nestedSelections": 0,
+      "fieldCount": 1,
+      "risk": "low"
+    },
+    {
+      "operation": "CreateCartAfterCheckout",
+      "file": "packages/peregrine/lib/talons/CheckoutPage/OrderConfirmationPage/createAccount.gql.js",
+      "line": 53,
+      "depth": 1,
+      "nestedSelections": 0,
+      "fieldCount": 1,
+      "risk": "low"
+    },
+    {
+      "operation": "GetProductsInWishlistsForGallery",
+      "file": "packages/peregrine/lib/talons/Wishlist/AddToListButton/addToListButton.gql.js",
+      "line": 21,
+      "depth": 1,
+      "nestedSelections": 0,
+      "fieldCount": 1,
+      "risk": "low"
+    },
+    {
+      "operation": "resetPassword",
+      "file": "packages/venia-ui/lib/components/MyAccount/ResetPassword/resetPassword.gql.js",
+      "line": 4,
+      "depth": 1,
+      "nestedSelections": 0,
+      "fieldCount": 1,
+      "risk": "low"
+    }
+  ],
+  "schemaDrift": [],
+  "unusedVariables": []
+}

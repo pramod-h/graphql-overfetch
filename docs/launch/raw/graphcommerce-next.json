@@ -1,0 +1,2595 @@
+{
+  "summary": {
+    "operations": 172,
+    "fragments": 247,
+    "components": 363,
+    "sourceFiles": 1781,
+    "graphqlFiles": 415,
+    "deadQueries": 10,
+    "deadFragments": 5,
+    "duplicateQueries": 11,
+    "duplicateFragments": 9,
+    "overfetchingQueries": 12,
+    "unrequestedReads": 1,
+    "schemaDrift": null
+  },
+  "overfetch": [
+    {
+      "operation": "InlineAccount",
+      "file": "packages/magento-cart/components/InlineAccount/InlineAccount.graphql",
+      "line": 1,
+      "requestedCount": 12,
+      "usedCount": 3,
+      "unused": [
+        {
+          "path": "cart.shipping_addresses.city",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.company",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.country.label",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.postcode",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.region.label",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.region.region_id",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.street",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.telephone",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.vat_id",
+          "confidence": "medium"
+        }
+      ],
+      "estimatedReductionPct": 75
+    },
+    {
+      "operation": "GetBillingAddress",
+      "file": "packages/magento-cart/graphql/queries/GetBillingAddress.graphql",
+      "line": 1,
+      "requestedCount": 22,
+      "usedCount": 8,
+      "unused": [
+        {
+          "path": "cart.billing_address.country.label",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.billing_address.region.label",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.billing_address.region.region_id",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.city",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.company",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.country.label",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.firstname",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.lastname",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.postcode",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.region.label",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.region.region_id",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.street",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.telephone",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.vat_id",
+          "confidence": "medium"
+        }
+      ],
+      "estimatedReductionPct": 64
+    },
+    {
+      "operation": "PagesStaticPaths",
+      "file": "packages/hygraph-ui/graphql/PagesStaticPaths.graphql",
+      "line": 1,
+      "requestedCount": 2,
+      "usedCount": 1,
+      "unused": [
+        {
+          "path": "pages.metaRobots",
+          "confidence": "medium"
+        }
+      ],
+      "estimatedReductionPct": 50
+    },
+    {
+      "operation": "GetCustomerNewsletterToggle",
+      "file": "packages/magento-newsletter/components/CustomerNewsletterToggle/GetCustomerNewsLetterToggle.graphql",
+      "line": 1,
+      "requestedCount": 2,
+      "usedCount": 1,
+      "unused": [
+        {
+          "path": "customer.email",
+          "confidence": "medium"
+        }
+      ],
+      "estimatedReductionPct": 50
+    },
+    {
+      "operation": "CartAdded",
+      "file": "packages/magento-cart/components/CartAdded/CartAdded.graphql",
+      "line": 1,
+      "requestedCount": 59,
+      "usedCount": 32,
+      "unused": [
+        {
+          "path": "cart.prices.applied_taxes.amount.currency",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.applied_taxes.amount.value",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.applied_taxes.label",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.discounts.amount.currency",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.discounts.amount.value",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.discounts.label",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.grand_total.currency",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.grand_total.value",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.subtotal_excluding_tax.currency",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.subtotal_excluding_tax.value",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.subtotal_including_tax.currency",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.subtotal_including_tax.value",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.subtotal_with_discount_excluding_tax.currency",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.subtotal_with_discount_excluding_tax.value",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.available_shipping_methods.price_excl_tax.currency",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.available_shipping_methods.price_excl_tax.value",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.available_shipping_methods.price_incl_tax.currency",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.available_shipping_methods.price_incl_tax.value",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.selected_shipping_method.amount.currency",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.selected_shipping_method.amount.value",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.selected_shipping_method.carrier_title",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.selected_shipping_method.method_title",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.selected_shipping_method.price_excl_tax.currency",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.selected_shipping_method.price_excl_tax.value",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.selected_shipping_method.price_incl_tax.currency",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.selected_shipping_method.price_incl_tax.value",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.total_quantity",
+          "confidence": "medium"
+        }
+      ],
+      "estimatedReductionPct": 46
+    },
+    {
+      "operation": "ContentStages",
+      "file": "packages/hygraph-ui/plugins/HygraphPreviewModeToolbar.tsx",
+      "line": 19,
+      "requestedCount": 3,
+      "usedCount": 2,
+      "unused": [
+        {
+          "path": "__type.name",
+          "confidence": "medium"
+        }
+      ],
+      "estimatedReductionPct": 33
+    },
+    {
+      "operation": "ProductReviewsPage",
+      "file": "packages/magento-review/components/ProductReviews/ProductReviewsPage.graphql",
+      "line": 1,
+      "requestedCount": 12,
+      "usedCount": 9,
+      "unused": [
+        {
+          "path": "products.items.review_count",
+          "confidence": "medium"
+        },
+        {
+          "path": "products.items.sku",
+          "confidence": "medium"
+        },
+        {
+          "path": "products.items.url_key",
+          "confidence": "medium"
+        }
+      ],
+      "estimatedReductionPct": 25
+    },
+    {
+      "operation": "CategorySearch",
+      "file": "packages/magento-search/graphql/queries/CategorySearch.graphql",
+      "line": 1,
+      "requestedCount": 9,
+      "usedCount": 7,
+      "unused": [
+        {
+          "path": "categories.algolia_indexName",
+          "confidence": "medium"
+        },
+        {
+          "path": "categories.algolia_queryID",
+          "confidence": "medium"
+        }
+      ],
+      "estimatedReductionPct": 22
+    },
+    {
+      "operation": "CartItemSummary",
+      "file": "packages/magento-cart/components/CartItemSummary/GetCartItemSummary.graphql",
+      "line": 1,
+      "requestedCount": 142,
+      "usedCount": 116,
+      "unused": [
+        {
+          "path": "cart.prices.applied_taxes.amount.currency",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.applied_taxes.amount.value",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.applied_taxes.label",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.discounts.amount.currency",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.discounts.amount.value",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.discounts.label",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.grand_total.currency",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.grand_total.value",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.subtotal_excluding_tax.currency",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.subtotal_excluding_tax.value",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.subtotal_including_tax.currency",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.subtotal_including_tax.value",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.subtotal_with_discount_excluding_tax.currency",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.subtotal_with_discount_excluding_tax.value",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.available_shipping_methods.price_excl_tax.currency",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.available_shipping_methods.price_excl_tax.value",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.available_shipping_methods.price_incl_tax.currency",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.available_shipping_methods.price_incl_tax.value",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.selected_shipping_method.amount.currency",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.selected_shipping_method.amount.value",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.selected_shipping_method.carrier_title",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.selected_shipping_method.method_title",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.selected_shipping_method.price_excl_tax.currency",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.selected_shipping_method.price_excl_tax.value",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.selected_shipping_method.price_incl_tax.currency",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.shipping_addresses.selected_shipping_method.price_incl_tax.value",
+          "confidence": "medium"
+        }
+      ],
+      "estimatedReductionPct": 18
+    },
+    {
+      "operation": "GetCartTotals",
+      "file": "packages/magento-cart/components/CartTotals/GetCartTotals.graphql",
+      "line": 1,
+      "requestedCount": 26,
+      "usedCount": 24,
+      "unused": [
+        {
+          "path": "cart.prices.subtotal_with_discount_excluding_tax.currency",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.prices.subtotal_with_discount_excluding_tax.value",
+          "confidence": "medium"
+        }
+      ],
+      "estimatedReductionPct": 8
+    },
+    {
+      "operation": "GetAddresses",
+      "file": "packages/magento-cart-shipping-address/components/ShippingAddressForm/GetAddresses.graphql",
+      "line": 1,
+      "requestedCount": 34,
+      "usedCount": 32,
+      "unused": [
+        {
+          "path": "cart.items.configured_variant.sku",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.items.product.sku",
+          "confidence": "medium"
+        }
+      ],
+      "estimatedReductionPct": 6
+    },
+    {
+      "operation": "GetCartSummary",
+      "file": "packages/magento-cart/components/CartSummary/GetCartSummary.graphql",
+      "line": 1,
+      "requestedCount": 37,
+      "usedCount": 35,
+      "unused": [
+        {
+          "path": "cart.items.configured_variant.sku",
+          "confidence": "medium"
+        },
+        {
+          "path": "cart.items.product.sku",
+          "confidence": "medium"
+        }
+      ],
+      "estimatedReductionPct": 5
+    }
+  ],
+  "unrequestedReads": [
+    {
+      "operation": "GetCategoryStaticPaths",
+      "file": "packages/magento-category/queries/GetCategoryStaticPaths.graphql",
+      "line": 1,
+      "reads": [
+        {
+          "path": "categories.items.children.children.children.children.children.children",
+          "file": "packages/magento-category/queries/getCategoryStaticPaths.ts",
+          "line": 14
+        }
+      ]
+    }
+  ],
+  "deadQueries": [
+    {
+      "name": "ConfigurableProductPage",
+      "operation": "query",
+      "file": "packages/magento-product-configurable/ConfigurableProductPage.graphql",
+      "line": 1
+    },
+    {
+      "name": "VirtualProductPage",
+      "operation": "query",
+      "file": "packages/magento-product-virtual/VirtualProductPage.graphql",
+      "line": 1
+    },
+    {
+      "name": "GetAlgoliaSettings",
+      "operation": "query",
+      "file": "packages/algolia-products/graphql/GetAlgoliaSettings.graphql",
+      "line": 1
+    },
+    {
+      "name": "UseCartRedirect",
+      "operation": "query",
+      "file": "packages/magento-cart/hooks/UseCartRedirect.graphql",
+      "line": 1
+    },
+    {
+      "name": "CmsBlocks",
+      "operation": "query",
+      "file": "packages/magento-cms/graphql/CmsBlocks.graphql",
+      "line": 1
+    },
+    {
+      "name": "AssignCompareListToCustomer",
+      "operation": "mutation",
+      "file": "packages/magento-compare/graphql/AssignCustomerToCompareList.graphql",
+      "line": 1
+    },
+    {
+      "name": "CustomerCompareList",
+      "operation": "query",
+      "file": "packages/magento-compare/graphql/CustomerCompareList.graphql",
+      "line": 1
+    },
+    {
+      "name": "BraintreeCcVaultPaymentMethod",
+      "operation": "mutation",
+      "file": "packages/magento-payment-braintree/graphql/BraintreeCcVaultPaymentMethod.graphql",
+      "line": 1
+    },
+    {
+      "name": "MSPCart",
+      "operation": "query",
+      "file": "packages/magento-payment-multisafepay/graphql/MSPCart.graphql",
+      "line": 1
+    },
+    {
+      "name": "MSPPaymentRequestData",
+      "operation": "query",
+      "file": "packages/magento-payment-multisafepay/graphql/MSPPaymentRequestData.graphql",
+      "line": 1
+    }
+  ],
+  "deadFragments": [
+    {
+      "name": "CustomerAddressEdit",
+      "typeCondition": "CustomerAddress",
+      "file": "packages/magento-customer/components/CreateCustomerAddressForm/CustomerAddressEdit.graphql",
+      "line": 1
+    },
+    {
+      "name": "ProductPageQueryFragment",
+      "typeCondition": "Query",
+      "file": "packages/magento-product/components/ProductPage/ProductPageQueryFragment.graphql",
+      "line": 1
+    },
+    {
+      "name": "ProductWishlistChip",
+      "typeCondition": "ProductInterface",
+      "file": "packages/magento-wishlist/components/ProductWishlistChip/ProductWishlistChip.graphql",
+      "line": 1
+    },
+    {
+      "name": "OrderComments",
+      "typeCondition": "CustomerOrder",
+      "file": "packages/magento-customer/components/Order/OrderComments/OrderComments.graphql",
+      "line": 1
+    },
+    {
+      "name": "Feature",
+      "typeCondition": "ProductInterface",
+      "file": "examples/magento-storyblok/components/Storyblok/RowPdp/variant/Feature/Feature.graphql",
+      "line": 1
+    }
+  ],
+  "duplicateQueries": [
+    {
+      "members": [
+        {
+          "name": "CategoryPage",
+          "file": "examples/magento-graphcms/graphql/CategoryPage.graphql",
+          "line": 1
+        },
+        {
+          "name": "CategoryPage",
+          "file": "examples/magento-open-source/graphql/CategoryPage.graphql",
+          "line": 1
+        },
+        {
+          "name": "CategoryPage",
+          "file": "examples/magento-storyblok/graphql/CategoryPage.graphql",
+          "line": 1
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "ProductPage2",
+          "file": "examples/magento-graphcms/graphql/ProductPage2.graphql",
+          "line": 1
+        },
+        {
+          "name": "ProductPage2",
+          "file": "examples/magento-open-source/graphql/ProductPage2.graphql",
+          "line": 1
+        },
+        {
+          "name": "ProductPage2",
+          "file": "examples/magento-storyblok/graphql/ProductPage2.graphql",
+          "line": 1
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "CartEmail",
+          "file": "packages/magento-cart-email/EmailForm/CartEmail.graphql",
+          "line": 1
+        },
+        {
+          "name": "GetCartEmail",
+          "file": "packages/magento-newsletter/components/SignupNewsletter/GetCartEmail.graphql",
+          "line": 1
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "PaymentMethodPlaceOrderNoop",
+          "file": "packages/magento-cart-payment-method/PaymentMethodPlaceOrderNoop/PaymentMethodPlaceOrderNoop.graphql",
+          "line": 1
+        },
+        {
+          "name": "BraintreePaymentMethodPlaceOrder",
+          "file": "packages/magento-payment-braintree/graphql/BraintreePaymentMethodPlaceOrder.graphql",
+          "line": 1
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "SignUp",
+          "file": "packages/magento-customer/components/SignUpForm/SignUp.graphql",
+          "line": 1
+        },
+        {
+          "name": "SignUpConfirm",
+          "file": "packages/magento-customer/components/SignUpForm/SignUpConfirm.graphql",
+          "line": 2
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "SubscribeGuest",
+          "file": "packages/magento-newsletter/components/CheckoutNewsletter/SubscribeGuest.graphql",
+          "line": 1
+        },
+        {
+          "name": "GuestNewsletterToggle",
+          "file": "packages/magento-newsletter/components/GuestNewsletterToggle/GuestNewsletterToggle.graphql",
+          "line": 1
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "AfterpayPaymentHandler",
+          "file": "packages/magento-payment-afterpay/components/AfterpayPaymentHandler/AfterpayPaymentHandler.graphql",
+          "line": 1
+        },
+        {
+          "name": "KlarnaPaymentPlaceOrder",
+          "file": "packages/magento-payment-klarna/components/KlarnaPaymentPlaceOrder/KlarnaPaymentPlaceOrder.graphql",
+          "line": 1
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "ProductReviewRatingsMetadata",
+          "file": "packages/magento-review/components/CreateProductReviewForm/ProductReviewRatingsMetadata.graphql",
+          "line": 1
+        },
+        {
+          "name": "ProductReviewRatingsMetadata",
+          "file": "packages/magento-review/components/ProductReviews/ProductReviewRatingsMetadata.graphql",
+          "line": 1
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "CartPage",
+          "file": "packages/magento-cart-checkout/queries/CartPage.graphql",
+          "line": 1
+        },
+        {
+          "name": "CartItemSummary",
+          "file": "packages/magento-cart/components/CartItemSummary/GetCartItemSummary.graphql",
+          "line": 1
+        }
+      ],
+      "similarity": 0.98
+    },
+    {
+      "members": [
+        {
+          "name": "GetCoupon",
+          "file": "packages/magento-cart-coupon/CouponAccordion/GetCoupon.graphql",
+          "line": 1
+        },
+        {
+          "name": "GetCartTotals",
+          "file": "packages/magento-cart/components/CartTotals/GetCartTotals.graphql",
+          "line": 1
+        }
+      ],
+      "similarity": 0.97
+    },
+    {
+      "members": [
+        {
+          "name": "GetCartSummary",
+          "file": "packages/magento-cart/components/CartSummary/GetCartSummary.graphql",
+          "line": 1
+        },
+        {
+          "name": "GetAddresses",
+          "file": "packages/magento-cart-shipping-address/components/ShippingAddressForm/GetAddresses.graphql",
+          "line": 1
+        }
+      ],
+      "similarity": 0.94
+    }
+  ],
+  "duplicateFragments": [
+    {
+      "members": [
+        {
+          "name": "InjectTotalsIntoCoupon",
+          "file": "packages/magento-cart-checkout/fragments/InjectTotalsIntoCoupon.graphql",
+          "line": 2
+        },
+        {
+          "name": "CartTotals",
+          "file": "packages/magento-cart/components/CartTotals/CartTotals.graphql",
+          "line": 1
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "CartItem_DatalayerItem",
+          "file": "packages/google-datalayer/mapping/cartItemToDatalayerItem/CartItem_DatalayerItem.graphql",
+          "line": 1
+        },
+        {
+          "name": "CartItem_RemoveFromCart",
+          "file": "packages/google-datalayer/mapping/cartItemToRemoveFromCart/CartItem_RemoveFromCart.graphql",
+          "line": 1
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "Product_DatalayerItem",
+          "file": "packages/google-datalayer/mapping/productToDatalayerItem/Product_DatalayerItem.graphql",
+          "line": 1
+        },
+        {
+          "name": "Product_ViewItem",
+          "file": "packages/google-datalayer/mapping/productToViewItem/Product_ViewItem.graphql",
+          "line": 1
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "AccountAddress",
+          "file": "packages/magento-customer/components/AccountAddress/AccountAddress.graphql",
+          "line": 1
+        },
+        {
+          "name": "CustomerAddress",
+          "file": "packages/magento-customer/components/CreateCustomerAddressForm/CustomerAddress.graphql",
+          "line": 1
+        },
+        {
+          "name": "CustomerAddressEdit",
+          "file": "packages/magento-customer/components/CreateCustomerAddressForm/CustomerAddressEdit.graphql",
+          "line": 1
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "ProductListPrice",
+          "file": "packages/magento-product/components/ProductListPrice/ProductListPrice.graphql",
+          "line": 1
+        },
+        {
+          "name": "ProductPrice",
+          "file": "packages/magento-product/components/ProductPagePrice/ProductPrice.graphql",
+          "line": 1
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "ConfigurableOptionValueColor",
+          "file": "packages/magento-product-configurable/components/ConfigurableOptionValueColor/ConfigurableOptionValueColor.graphql",
+          "line": 1
+        },
+        {
+          "name": "ConfigurableOptionValueText",
+          "file": "packages/magento-product-configurable/components/ConfigurableOptionValueText/ConfigurableOptionValueText.graphql",
+          "line": 1
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "ProductReviewSummaryChip",
+          "file": "packages/magento-review/components/ProductReviewChip/ProductReviewSummaryChip.graphql",
+          "line": 1
+        },
+        {
+          "name": "ProductReviewSummary",
+          "file": "packages/magento-review/components/ProductReviewSummary/ProductReviewSummary.graphql",
+          "line": 1
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "ProductFeatureMedia",
+          "file": "examples/magento-graphcms/components/GraphCMS/RowProduct/variant/ProductFeatureMedia.graphql",
+          "line": 1
+        },
+        {
+          "name": "ProductFeatureMediaBoxed",
+          "file": "examples/magento-graphcms/components/GraphCMS/RowProduct/variant/ProductFeatureMediaBoxed.graphql",
+          "line": 1
+        },
+        {
+          "name": "Feature",
+          "file": "examples/magento-storyblok/components/Storyblok/RowPdp/variant/Feature/Feature.graphql",
+          "line": 1
+        },
+        {
+          "name": "FeatureBoxed",
+          "file": "examples/magento-storyblok/components/Storyblok/RowPdp/variant/FeatureBoxed/FeatureBoxed.graphql",
+          "line": 1
+        }
+      ],
+      "similarity": 1
+    },
+    {
+      "members": [
+        {
+          "name": "Cart_BeginCheckout",
+          "file": "packages/google-datalayer/mapping/cartToBeginCheckout/Cart_BeginCheckout.graphql",
+          "line": 1
+        },
+        {
+          "name": "CartStartCheckout",
+          "file": "packages/magento-cart/components/CartStartCheckout/CartStartCheckout.graphql",
+          "line": 1
+        }
+      ],
+      "similarity": 0.93
+    }
+  ],
+  "complexity": [
+    {
+      "operation": "GetConfigurableOptionsSelection",
+      "file": "packages/magento-product-configurable/graphql/queries/GetConfigurableOptionsSelection.graphql",
+      "line": 1,
+      "depth": 11,
+      "nestedSelections": 50,
+      "fieldCount": 232,
+      "risk": "high"
+    },
+    {
+      "operation": "ProductPage2",
+      "file": "examples/magento-graphcms/graphql/ProductPage2.graphql",
+      "line": 1,
+      "depth": 9,
+      "nestedSelections": 91,
+      "fieldCount": 364,
+      "risk": "high"
+    },
+    {
+      "operation": "ProductPage2",
+      "file": "examples/magento-open-source/graphql/ProductPage2.graphql",
+      "line": 1,
+      "depth": 9,
+      "nestedSelections": 91,
+      "fieldCount": 364,
+      "risk": "high"
+    },
+    {
+      "operation": "ProductPage2",
+      "file": "examples/magento-storyblok/graphql/ProductPage2.graphql",
+      "line": 1,
+      "depth": 9,
+      "nestedSelections": 91,
+      "fieldCount": 364,
+      "risk": "high"
+    },
+    {
+      "operation": "CreditMemoDetailPage",
+      "file": "packages/magento-customer/graphql/queries/CreditMemoDetailPage.graphql",
+      "line": 1,
+      "depth": 9,
+      "nestedSelections": 60,
+      "fieldCount": 196,
+      "risk": "high"
+    },
+    {
+      "operation": "InvoiceDetailPage",
+      "file": "packages/magento-customer/graphql/queries/InvoiceDetailPage.graphql",
+      "line": 1,
+      "depth": 9,
+      "nestedSelections": 58,
+      "fieldCount": 190,
+      "risk": "high"
+    },
+    {
+      "operation": "ShipmentDetailPage",
+      "file": "packages/magento-customer/graphql/queries/ShipmentDetailPage.graphql",
+      "line": 1,
+      "depth": 9,
+      "nestedSelections": 37,
+      "fieldCount": 135,
+      "risk": "high"
+    },
+    {
+      "operation": "UseWishlistGuest",
+      "file": "packages/magento-wishlist/hooks/useWishlistitems/UseWishlistGuest.graphql",
+      "line": 1,
+      "depth": 9,
+      "nestedSelections": 15,
+      "fieldCount": 52,
+      "risk": "high"
+    },
+    {
+      "operation": "AddProductToWishlist",
+      "file": "packages/magento-wishlist/hooks/useAddProductsToWishlist/AddProductToWishlist.graphql",
+      "line": 1,
+      "depth": 9,
+      "nestedSelections": 15,
+      "fieldCount": 51,
+      "risk": "high"
+    },
+    {
+      "operation": "UseRemoveProductsFromWishlist",
+      "file": "packages/magento-wishlist/hooks/useRemoveProductsFromWishlist/UseRemoveProductsFromWishlist.graphql",
+      "line": 1,
+      "depth": 9,
+      "nestedSelections": 15,
+      "fieldCount": 51,
+      "risk": "high"
+    },
+    {
+      "operation": "UseWishlistCustomer",
+      "file": "packages/magento-wishlist/hooks/useWishlistitems/UseWishlistCustomer.graphql",
+      "line": 1,
+      "depth": 9,
+      "nestedSelections": 15,
+      "fieldCount": 51,
+      "risk": "high"
+    },
+    {
+      "operation": "AddProductsToCart",
+      "file": "packages/magento-product/components/AddProductsToCart/AddProductsToCart.graphql",
+      "line": 1,
+      "depth": 8,
+      "nestedSelections": 62,
+      "fieldCount": 237,
+      "risk": "high"
+    },
+    {
+      "operation": "RemoveItemFromCart",
+      "file": "packages/magento-cart-items/components/RemoveItemFromCart/RemoveItemFromCart.graphql",
+      "line": 1,
+      "depth": 8,
+      "nestedSelections": 60,
+      "fieldCount": 231,
+      "risk": "high"
+    },
+    {
+      "operation": "UpdateItemQuantity",
+      "file": "packages/magento-cart-items/components/UpdateItemQuantity/UpdateItemQuantity.graphql",
+      "line": 1,
+      "depth": 8,
+      "nestedSelections": 60,
+      "fieldCount": 231,
+      "risk": "high"
+    },
+    {
+      "operation": "OrderDetailPage",
+      "file": "packages/magento-customer/graphql/queries/OrderDetailPage.graphql",
+      "line": 1,
+      "depth": 8,
+      "nestedSelections": 48,
+      "fieldCount": 173,
+      "risk": "high"
+    },
+    {
+      "operation": "AdyenPaymentOptionsAndPlaceOrder",
+      "file": "packages/magento-payment-adyen/components/AdyenPaymentOptionsAndPlaceOrder/AdyenPaymentOptionsAndPlaceOrder.graphql",
+      "line": 1,
+      "depth": 8,
+      "nestedSelections": 41,
+      "fieldCount": 119,
+      "risk": "high"
+    },
+    {
+      "operation": "PayPalPaymentHandler",
+      "file": "packages/magento-payment-paypal/components/PayPalPaymentHandler/PayPalPaymentHandler.graphql",
+      "line": 1,
+      "depth": 8,
+      "nestedSelections": 40,
+      "fieldCount": 114,
+      "risk": "high"
+    },
+    {
+      "operation": "ReorderItems",
+      "file": "packages/magento-customer/components/ReorderItems/ReorderItems.graphql",
+      "line": 1,
+      "depth": 8,
+      "nestedSelections": 38,
+      "fieldCount": 113,
+      "risk": "high"
+    },
+    {
+      "operation": "ProductAddToCart",
+      "file": "packages/magento-product/components/ProductAddToCart/ProductAddToCart.graphql",
+      "line": 1,
+      "depth": 8,
+      "nestedSelections": 38,
+      "fieldCount": 113,
+      "risk": "high"
+    },
+    {
+      "operation": "AfterpayPaymentHandler",
+      "file": "packages/magento-payment-afterpay/components/AfterpayPaymentHandler/AfterpayPaymentHandler.graphql",
+      "line": 1,
+      "depth": 8,
+      "nestedSelections": 39,
+      "fieldCount": 111,
+      "risk": "high"
+    },
+    {
+      "operation": "KlarnaPaymentPlaceOrder",
+      "file": "packages/magento-payment-klarna/components/KlarnaPaymentPlaceOrder/KlarnaPaymentPlaceOrder.graphql",
+      "line": 1,
+      "depth": 8,
+      "nestedSelections": 39,
+      "fieldCount": 111,
+      "risk": "high"
+    },
+    {
+      "operation": "PaymentMethodOptionsNoop",
+      "file": "packages/magento-cart-payment-method/PaymentMethodOptionsNoop/PaymentMethodOptionsNoop.graphql",
+      "line": 1,
+      "depth": 8,
+      "nestedSelections": 37,
+      "fieldCount": 108,
+      "risk": "high"
+    },
+    {
+      "operation": "BraintreeCcVaultPaymentMethod",
+      "file": "packages/magento-payment-braintree/graphql/BraintreeCcVaultPaymentMethod.graphql",
+      "line": 1,
+      "depth": 8,
+      "nestedSelections": 37,
+      "fieldCount": 108,
+      "risk": "high"
+    },
+    {
+      "operation": "BraintreePaymentMethodOptions",
+      "file": "packages/magento-payment-braintree/graphql/BraintreePaymentMethodOptions.graphql",
+      "line": 1,
+      "depth": 8,
+      "nestedSelections": 37,
+      "fieldCount": 108,
+      "risk": "high"
+    },
+    {
+      "operation": "PurchaseOrderOptions",
+      "file": "packages/magento-payment-included/PurchaseOrder/PurchaseOrderOptions.graphql",
+      "line": 1,
+      "depth": 8,
+      "nestedSelections": 37,
+      "fieldCount": 108,
+      "risk": "high"
+    },
+    {
+      "operation": "SetMolliePaymentMethodTokenOnCart",
+      "file": "packages/mollie-magento-payment/components/MollieOptionsToken/SetMolliePaymentMethodTokenOnCart.graphql",
+      "line": 1,
+      "depth": 8,
+      "nestedSelections": 37,
+      "fieldCount": 108,
+      "risk": "high"
+    },
+    {
+      "operation": "ConfigurableProductPage",
+      "file": "packages/magento-product-configurable/ConfigurableProductPage.graphql",
+      "line": 1,
+      "depth": 8,
+      "nestedSelections": 29,
+      "fieldCount": 99,
+      "risk": "high"
+    },
+    {
+      "operation": "ShippingMethodForm",
+      "file": "packages/magento-cart-shipping-method/components/ShippingMethodForm/ShippingMethodForm.graphql",
+      "line": 1,
+      "depth": 8,
+      "nestedSelections": 28,
+      "fieldCount": 94,
+      "risk": "high"
+    },
+    {
+      "operation": "CustomerCompareList",
+      "file": "packages/magento-compare/graphql/CustomerCompareList.graphql",
+      "line": 1,
+      "depth": 8,
+      "nestedSelections": 15,
+      "fieldCount": 48,
+      "risk": "high"
+    },
+    {
+      "operation": "GetCategoryStaticPaths",
+      "file": "packages/magento-category/queries/GetCategoryStaticPaths.graphql",
+      "line": 1,
+      "depth": 8,
+      "nestedSelections": 7,
+      "fieldCount": 19,
+      "risk": "high"
+    },
+    {
+      "operation": "BillingPage",
+      "file": "packages/magento-cart-checkout/queries/BillingPage.graphql",
+      "line": 1,
+      "depth": 7,
+      "nestedSelections": 70,
+      "fieldCount": 287,
+      "risk": "high"
+    },
+    {
+      "operation": "CartPage",
+      "file": "packages/magento-cart-checkout/queries/CartPage.graphql",
+      "line": 1,
+      "depth": 7,
+      "nestedSelections": 60,
+      "fieldCount": 233,
+      "risk": "high"
+    },
+    {
+      "operation": "CartItemSummary",
+      "file": "packages/magento-cart/components/CartItemSummary/GetCartItemSummary.graphql",
+      "line": 1,
+      "depth": 7,
+      "nestedSelections": 59,
+      "fieldCount": 228,
+      "risk": "high"
+    },
+    {
+      "operation": "CancelOrder",
+      "file": "packages/magento-customer/components/CancelOrder/CancelOrder.graphql",
+      "line": 1,
+      "depth": 7,
+      "nestedSelections": 39,
+      "fieldCount": 153,
+      "risk": "high"
+    },
+    {
+      "operation": "ShippingPage",
+      "file": "packages/magento-cart-checkout/queries/ShippingPage.graphql",
+      "line": 1,
+      "depth": 7,
+      "nestedSelections": 32,
+      "fieldCount": 116,
+      "risk": "high"
+    },
+    {
+      "operation": "CartAdded",
+      "file": "packages/magento-cart/components/CartAdded/CartAdded.graphql",
+      "line": 1,
+      "depth": 7,
+      "nestedSelections": 36,
+      "fieldCount": 109,
+      "risk": "high"
+    },
+    {
+      "operation": "GetPaymentMethodContext",
+      "file": "packages/magento-cart-payment-method/PaymentMethodContext/GetPaymentMethodContext.graphql",
+      "line": 1,
+      "depth": 7,
+      "nestedSelections": 32,
+      "fieldCount": 89,
+      "risk": "high"
+    },
+    {
+      "operation": "GetAlgoliaSettings",
+      "file": "packages/algolia-products/graphql/GetAlgoliaSettings.graphql",
+      "line": 1,
+      "depth": 7,
+      "nestedSelections": 15,
+      "fieldCount": 88,
+      "risk": "high"
+    },
+    {
+      "operation": "CompareList",
+      "file": "packages/magento-compare/graphql/CompareList.graphql",
+      "line": 1,
+      "depth": 7,
+      "nestedSelections": 14,
+      "fieldCount": 47,
+      "risk": "medium"
+    },
+    {
+      "operation": "Crosssells",
+      "file": "packages/magento-cart/components/CartAdded/Crosssells.graphql",
+      "line": 1,
+      "depth": 7,
+      "nestedSelections": 12,
+      "fieldCount": 41,
+      "risk": "medium"
+    },
+    {
+      "operation": "AccountDashboardOrders",
+      "file": "packages/magento-customer/graphql/queries/AccountDashboardOrders.graphql",
+      "line": 1,
+      "depth": 7,
+      "nestedSelections": 9,
+      "fieldCount": 31,
+      "risk": "medium"
+    },
+    {
+      "operation": "getSchema",
+      "file": "packages/hygraph-cli/src/readSchema.ts",
+      "line": 8,
+      "depth": 7,
+      "nestedSelections": 11,
+      "fieldCount": 22,
+      "risk": "medium"
+    },
+    {
+      "operation": "GuestOrder",
+      "file": "packages/magento-customer/components/GuestOrderOverview/GuestOrder.graphql",
+      "line": 1,
+      "depth": 6,
+      "nestedSelections": 38,
+      "fieldCount": 150,
+      "risk": "high"
+    },
+    {
+      "operation": "AccountDashboard",
+      "file": "packages/magento-customer/graphql/queries/AccountDashboard.graphql",
+      "line": 1,
+      "depth": 6,
+      "nestedSelections": 17,
+      "fieldCount": 72,
+      "risk": "high"
+    },
+    {
+      "operation": "SetShippingBillingAddress",
+      "file": "packages/magento-cart-shipping-address/components/ShippingAddressForm/SetShippingBillingAddress.graphql",
+      "line": 1,
+      "depth": 6,
+      "nestedSelections": 17,
+      "fieldCount": 71,
+      "risk": "high"
+    },
+    {
+      "operation": "SetCustomerShippingBillingAddressOnCart",
+      "file": "packages/magento-cart-shipping-address/components/CustomerAddressForm/SetCustomerShippingBillingAddressOnCart.graphql",
+      "line": 1,
+      "depth": 6,
+      "nestedSelections": 17,
+      "fieldCount": 69,
+      "risk": "high"
+    },
+    {
+      "operation": "ProductList",
+      "file": "packages/magento-product/components/ProductList/ProductList.graphql",
+      "line": 1,
+      "depth": 6,
+      "nestedSelections": 17,
+      "fieldCount": 59,
+      "risk": "high"
+    },
+    {
+      "operation": "Layout",
+      "file": "examples/magento-graphcms/components/Layout/Layout.graphql",
+      "line": 1,
+      "depth": 6,
+      "nestedSelections": 12,
+      "fieldCount": 57,
+      "risk": "medium"
+    },
+    {
+      "operation": "ApplyCouponForm",
+      "file": "packages/magento-cart-coupon/ApplyCouponForm/ApplyCouponForm.graphql",
+      "line": 1,
+      "depth": 6,
+      "nestedSelections": 20,
+      "fieldCount": 54,
+      "risk": "high"
+    },
+    {
+      "operation": "RemoveCouponForm",
+      "file": "packages/magento-cart-coupon/RemoveCouponForm/RemoveCouponForm.graphql",
+      "line": 1,
+      "depth": 6,
+      "nestedSelections": 20,
+      "fieldCount": 54,
+      "risk": "high"
+    },
+    {
+      "operation": "SetShippingAddress",
+      "file": "packages/magento-cart-shipping-address/components/ShippingAddressForm/SetShippingAddress.graphql",
+      "line": 1,
+      "depth": 6,
+      "nestedSelections": 12,
+      "fieldCount": 49,
+      "risk": "medium"
+    },
+    {
+      "operation": "SetPickupLocationOnCart",
+      "file": "packages/magento-cart-pickup/graphql/SetPickupLocationOnCart.graphql",
+      "line": 1,
+      "depth": 6,
+      "nestedSelections": 12,
+      "fieldCount": 48,
+      "risk": "medium"
+    },
+    {
+      "operation": "SetCustomerShippingAddressOnCart",
+      "file": "packages/magento-cart-shipping-address/components/CustomerAddressForm/SetCustomerShippingAddressOnCart.graphql",
+      "line": 1,
+      "depth": 6,
+      "nestedSelections": 12,
+      "fieldCount": 48,
+      "risk": "medium"
+    },
+    {
+      "operation": "Layout",
+      "file": "examples/magento-open-source/components/Layout/Layout.graphql",
+      "line": 1,
+      "depth": 6,
+      "nestedSelections": 7,
+      "fieldCount": 34,
+      "risk": "medium"
+    },
+    {
+      "operation": "UseAdyenPaymentMethods",
+      "file": "packages/magento-payment-adyen/hooks/UseAdyenPaymentMethods.graphql",
+      "line": 1,
+      "depth": 6,
+      "nestedSelections": 11,
+      "fieldCount": 33,
+      "risk": "medium"
+    },
+    {
+      "operation": "Layout",
+      "file": "examples/magento-storyblok/components/Layout/Layout.graphql",
+      "line": 1,
+      "depth": 6,
+      "nestedSelections": 5,
+      "fieldCount": 30,
+      "risk": "medium"
+    },
+    {
+      "operation": "ProductReviewsPage",
+      "file": "packages/magento-review/components/ProductReviews/ProductReviewsPage.graphql",
+      "line": 1,
+      "depth": 6,
+      "nestedSelections": 6,
+      "fieldCount": 20,
+      "risk": "medium"
+    },
+    {
+      "operation": "AccountDashboardReviews",
+      "file": "packages/magento-review/queries/AccountDashboardReviews.graphql",
+      "line": 1,
+      "depth": 6,
+      "nestedSelections": 6,
+      "fieldCount": 19,
+      "risk": "medium"
+    },
+    {
+      "operation": "HygraphPages",
+      "file": "packages/hygraph-ui/graphql/HygraphPages.graphql",
+      "line": 1,
+      "depth": 5,
+      "nestedSelections": 24,
+      "fieldCount": 100,
+      "risk": "high"
+    },
+    {
+      "operation": "GetCartSummary",
+      "file": "packages/magento-cart/components/CartSummary/GetCartSummary.graphql",
+      "line": 1,
+      "depth": 5,
+      "nestedSelections": 14,
+      "fieldCount": 66,
+      "risk": "medium"
+    },
+    {
+      "operation": "GetAddresses",
+      "file": "packages/magento-cart-shipping-address/components/ShippingAddressForm/GetAddresses.graphql",
+      "line": 1,
+      "depth": 5,
+      "nestedSelections": 14,
+      "fieldCount": 63,
+      "risk": "medium"
+    },
+    {
+      "operation": "GetCoupon",
+      "file": "packages/magento-cart-coupon/CouponAccordion/GetCoupon.graphql",
+      "line": 1,
+      "depth": 5,
+      "nestedSelections": 19,
+      "fieldCount": 53,
+      "risk": "high"
+    },
+    {
+      "operation": "GetCartTotals",
+      "file": "packages/magento-cart/components/CartTotals/GetCartTotals.graphql",
+      "line": 1,
+      "depth": 5,
+      "nestedSelections": 18,
+      "fieldCount": 51,
+      "risk": "high"
+    },
+    {
+      "operation": "MSPCart",
+      "file": "packages/magento-payment-multisafepay/graphql/MSPCart.graphql",
+      "line": 1,
+      "depth": 5,
+      "nestedSelections": 18,
+      "fieldCount": 49,
+      "risk": "high"
+    },
+    {
+      "operation": "UseCustomerCreateForm",
+      "file": "packages/magento-customer/components/CustomerForms/UseCustomerCreateForm.graphql",
+      "line": 1,
+      "depth": 5,
+      "nestedSelections": 6,
+      "fieldCount": 42,
+      "risk": "medium"
+    },
+    {
+      "operation": "UseCustomerUpdateForm",
+      "file": "packages/magento-customer/components/CustomerForms/UseCustomerUpdateForm.graphql",
+      "line": 1,
+      "depth": 5,
+      "nestedSelections": 6,
+      "fieldCount": 42,
+      "risk": "medium"
+    },
+    {
+      "operation": "SignUp",
+      "file": "packages/magento-customer/components/SignUpForm/SignUp.graphql",
+      "line": 1,
+      "depth": 5,
+      "nestedSelections": 6,
+      "fieldCount": 42,
+      "risk": "medium"
+    },
+    {
+      "operation": "SignUpConfirm",
+      "file": "packages/magento-customer/components/SignUpForm/SignUpConfirm.graphql",
+      "line": 2,
+      "depth": 5,
+      "nestedSelections": 6,
+      "fieldCount": 42,
+      "risk": "medium"
+    },
+    {
+      "operation": "GetShippingMethods",
+      "file": "packages/magento-cart-shipping-method/components/ShippingMethodForm/GetShippingMethods.graphql",
+      "line": 1,
+      "depth": 5,
+      "nestedSelections": 10,
+      "fieldCount": 35,
+      "risk": "medium"
+    },
+    {
+      "operation": "DynamicRows",
+      "file": "packages/hygraph-dynamic-rows/graphql/DynamicRows.graphql",
+      "line": 1,
+      "depth": 5,
+      "nestedSelections": 9,
+      "fieldCount": 29,
+      "risk": "medium"
+    },
+    {
+      "operation": "AllDynamicRows",
+      "file": "packages/hygraph-dynamic-rows/graphql/AllDynamicRows.graphql",
+      "line": 1,
+      "depth": 5,
+      "nestedSelections": 6,
+      "fieldCount": 23,
+      "risk": "medium"
+    },
+    {
+      "operation": "SetBillingAddress",
+      "file": "packages/magento-cart-shipping-address/components/ShippingAddressForm/SetBillingAddress.graphql",
+      "line": 1,
+      "depth": 5,
+      "nestedSelections": 5,
+      "fieldCount": 22,
+      "risk": "medium"
+    },
+    {
+      "operation": "SetCustomerBillingAddressOnCart",
+      "file": "packages/magento-cart-shipping-address/components/CustomerAddressForm/SetCustomerBillingAddressOnCart.graphql",
+      "line": 1,
+      "depth": 5,
+      "nestedSelections": 5,
+      "fieldCount": 21,
+      "risk": "medium"
+    },
+    {
+      "operation": "CreateProductReview",
+      "file": "packages/magento-review/components/CreateProductReviewForm/CreateProductReview.graphql",
+      "line": 1,
+      "depth": 5,
+      "nestedSelections": 5,
+      "fieldCount": 18,
+      "risk": "medium"
+    },
+    {
+      "operation": "Environments",
+      "file": "packages/hygraph-cli/src/utils/getEndpointUrl.ts",
+      "line": 25,
+      "depth": 5,
+      "nestedSelections": 4,
+      "fieldCount": 9,
+      "risk": "medium"
+    },
+    {
+      "operation": "MSPPaymentRequestData",
+      "file": "packages/magento-payment-multisafepay/graphql/MSPPaymentRequestData.graphql",
+      "line": 1,
+      "depth": 4,
+      "nestedSelections": 9,
+      "fieldCount": 46,
+      "risk": "medium"
+    },
+    {
+      "operation": "Customer",
+      "file": "packages/magento-customer/hooks/Customer.graphql",
+      "line": 1,
+      "depth": 4,
+      "nestedSelections": 5,
+      "fieldCount": 41,
+      "risk": "low"
+    },
+    {
+      "operation": "ChangePassword",
+      "file": "packages/magento-customer/components/ChangePasswordForm/ChangePassword.graphql",
+      "line": 1,
+      "depth": 4,
+      "nestedSelections": 5,
+      "fieldCount": 41,
+      "risk": "low"
+    },
+    {
+      "operation": "GetBillingAddress",
+      "file": "packages/magento-cart/graphql/queries/GetBillingAddress.graphql",
+      "line": 1,
+      "depth": 4,
+      "nestedSelections": 7,
+      "fieldCount": 37,
+      "risk": "low"
+    },
+    {
+      "operation": "CategoryPage",
+      "file": "examples/magento-graphcms/graphql/CategoryPage.graphql",
+      "line": 1,
+      "depth": 4,
+      "nestedSelections": 4,
+      "fieldCount": 29,
+      "risk": "low"
+    },
+    {
+      "operation": "CategoryPage",
+      "file": "examples/magento-open-source/graphql/CategoryPage.graphql",
+      "line": 1,
+      "depth": 4,
+      "nestedSelections": 4,
+      "fieldCount": 29,
+      "risk": "low"
+    },
+    {
+      "operation": "CategoryPage",
+      "file": "examples/magento-storyblok/graphql/CategoryPage.graphql",
+      "line": 1,
+      "depth": 4,
+      "nestedSelections": 4,
+      "fieldCount": 29,
+      "risk": "low"
+    },
+    {
+      "operation": "Usps",
+      "file": "examples/magento-graphcms/components/Usps/Usps.graphql",
+      "line": 1,
+      "depth": 4,
+      "nestedSelections": 8,
+      "fieldCount": 28,
+      "risk": "medium"
+    },
+    {
+      "operation": "AttributesForm",
+      "file": "packages/magento-store/graphql/queries/AttributesForm.graphql",
+      "line": 1,
+      "depth": 4,
+      "nestedSelections": 5,
+      "fieldCount": 22,
+      "risk": "low"
+    },
+    {
+      "operation": "InlineAccount",
+      "file": "packages/magento-cart/components/InlineAccount/InlineAccount.graphql",
+      "line": 1,
+      "depth": 4,
+      "nestedSelections": 4,
+      "fieldCount": 21,
+      "risk": "low"
+    },
+    {
+      "operation": "AccountDashboardAddresses",
+      "file": "packages/magento-customer/graphql/queries/AccountDashboardAddresses.graphql",
+      "line": 1,
+      "depth": 4,
+      "nestedSelections": 3,
+      "fieldCount": 21,
+      "risk": "low"
+    },
+    {
+      "operation": "BraintreeLocalPaymentsCart",
+      "file": "packages/magento-payment-braintree/methods/braintree_local_payments/BraintreeLocalPaymentsCart.graphql",
+      "line": 1,
+      "depth": 4,
+      "nestedSelections": 6,
+      "fieldCount": 19,
+      "risk": "low"
+    },
+    {
+      "operation": "StoreSwitcherList",
+      "file": "packages/magento-store/graphql/queries/StoreSwitcherList.graphql",
+      "line": 1,
+      "depth": 4,
+      "nestedSelections": 3,
+      "fieldCount": 17,
+      "risk": "low"
+    },
+    {
+      "operation": "CategorySearch",
+      "file": "packages/magento-search/graphql/queries/CategorySearch.graphql",
+      "line": 1,
+      "depth": 4,
+      "nestedSelections": 3,
+      "fieldCount": 14,
+      "risk": "low"
+    },
+    {
+      "operation": "ProductFilters",
+      "file": "packages/magento-product/components/ProductListFilters/ProductFilters.graphql",
+      "line": 1,
+      "depth": 4,
+      "nestedSelections": 4,
+      "fieldCount": 13,
+      "risk": "low"
+    },
+    {
+      "operation": "MSPPaymentPlaceOrder",
+      "file": "packages/magento-payment-multisafepay/components/MSPPaymentPlaceOrder/MSPPaymentPlaceOrder.graphql",
+      "line": 1,
+      "depth": 4,
+      "nestedSelections": 4,
+      "fieldCount": 9,
+      "risk": "low"
+    },
+    {
+      "operation": "OrderCardItemImages",
+      "file": "packages/magento-customer/hooks/OrderCardItemImages.graphql",
+      "line": 1,
+      "depth": 4,
+      "nestedSelections": 3,
+      "fieldCount": 8,
+      "risk": "low"
+    },
+    {
+      "operation": "KlarnaPaymentOptions",
+      "file": "packages/magento-payment-klarna/components/KlarnaPaymentOptions/KlarnaPaymentOptions.graphql",
+      "line": 1,
+      "depth": 4,
+      "nestedSelections": 3,
+      "fieldCount": 8,
+      "risk": "low"
+    },
+    {
+      "operation": "DeletePaymentToken",
+      "file": "packages/magento-payment-tokens/graphql/mutations/DeletePaymentToken.graphql",
+      "line": 1,
+      "depth": 4,
+      "nestedSelections": 3,
+      "fieldCount": 8,
+      "risk": "low"
+    },
+    {
+      "operation": "ProductReviewRatingsMetadata",
+      "file": "packages/magento-review/components/CreateProductReviewForm/ProductReviewRatingsMetadata.graphql",
+      "line": 1,
+      "depth": 4,
+      "nestedSelections": 3,
+      "fieldCount": 7,
+      "risk": "low"
+    },
+    {
+      "operation": "ProductReviewRatingsMetadata",
+      "file": "packages/magento-review/components/ProductReviews/ProductReviewRatingsMetadata.graphql",
+      "line": 1,
+      "depth": 4,
+      "nestedSelections": 3,
+      "fieldCount": 7,
+      "risk": "low"
+    },
+    {
+      "operation": "FilterInputTypes",
+      "file": "packages/magento-product/components/ProductListItems/getFilterTypes.ts",
+      "line": 20,
+      "depth": 4,
+      "nestedSelections": 3,
+      "fieldCount": 5,
+      "risk": "low"
+    },
+    {
+      "operation": "StoreConfig",
+      "file": "packages/magento-store/graphql/queries/StoreConfig.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 4,
+      "fieldCount": 51,
+      "risk": "low"
+    },
+    {
+      "operation": "UpdateCustomerAddress",
+      "file": "packages/magento-customer/components/EditAddressForm/UpdateCustomerAddress.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 21,
+      "risk": "low"
+    },
+    {
+      "operation": "GetPickupLocationsForProducts",
+      "file": "packages/magento-cart-pickup/graphql/GetPickupLocationsForProducts.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 17,
+      "risk": "low"
+    },
+    {
+      "operation": "BlogList",
+      "file": "examples/magento-graphcms/components/Blog/BlogList.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 11,
+      "risk": "low"
+    },
+    {
+      "operation": "BlogListTagged",
+      "file": "examples/magento-graphcms/components/Blog/BlogListTagged.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 11,
+      "risk": "low"
+    },
+    {
+      "operation": "ProductStaticPaths",
+      "file": "packages/magento-product/components/ProductStaticPaths/ProductStaticPaths.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 3,
+      "fieldCount": 9,
+      "risk": "low"
+    },
+    {
+      "operation": "CountryRegions",
+      "file": "packages/magento-store/graphql/queries/CountryRegions.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 9,
+      "risk": "low"
+    },
+    {
+      "operation": "CategorySiblings",
+      "file": "packages/magento-category/components/CategoryChildren/CategorySiblings.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 8,
+      "risk": "low"
+    },
+    {
+      "operation": "MolliePlaceOrder",
+      "file": "packages/mollie-magento-payment/components/MolliePlaceOrder/MolliePlaceOrder.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 3,
+      "fieldCount": 8,
+      "risk": "low"
+    },
+    {
+      "operation": "DownloadsPage",
+      "file": "packages/magento-product-downloadable/graphql/queries/DownloadsPage.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 7,
+      "risk": "low"
+    },
+    {
+      "operation": "PaymentMethodPlaceOrderNoop",
+      "file": "packages/magento-cart-payment-method/PaymentMethodPlaceOrderNoop/PaymentMethodPlaceOrderNoop.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 3,
+      "fieldCount": 6,
+      "risk": "low"
+    },
+    {
+      "operation": "BraintreePaymentMethodPlaceOrder",
+      "file": "packages/magento-payment-braintree/graphql/BraintreePaymentMethodPlaceOrder.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 3,
+      "fieldCount": 6,
+      "risk": "low"
+    },
+    {
+      "operation": "RecentlyViewedProducts",
+      "file": "packages/magento-recently-viewed-products/graphql/RecentlyViewedProducts.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 6,
+      "risk": "low"
+    },
+    {
+      "operation": "CustomerPaymentTokens",
+      "file": "packages/magento-payment-tokens/graphql/queries/PaymentTokens.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 6,
+      "risk": "low"
+    },
+    {
+      "operation": "ProductReviewProductName",
+      "file": "packages/magento-review/components/ProductReviews/ProductReviewProductName.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 6,
+      "risk": "low"
+    },
+    {
+      "operation": "HygraphAllPages",
+      "file": "packages/hygraph-ui/graphql/HygraphAllPages.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 3,
+      "fieldCount": 5,
+      "risk": "low"
+    },
+    {
+      "operation": "HygraphStaticPaths",
+      "file": "packages/hygraph-ui/graphql/HygraphStaticPaths.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 3,
+      "fieldCount": 5,
+      "risk": "low"
+    },
+    {
+      "operation": "SetGuestEmailOnCart",
+      "file": "packages/magento-cart-email/EmailForm/SetGuestEmailOnCart.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 5,
+      "risk": "low"
+    },
+    {
+      "operation": "AddProductsToCompareList",
+      "file": "packages/magento-compare/graphql/AddProductsToCompareList.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 5,
+      "risk": "low"
+    },
+    {
+      "operation": "CompareSummary",
+      "file": "packages/magento-compare/graphql/CompareSummary.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 5,
+      "risk": "low"
+    },
+    {
+      "operation": "CreateCompareList",
+      "file": "packages/magento-compare/graphql/CreateCompareList.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 5,
+      "risk": "low"
+    },
+    {
+      "operation": "RemoveProductsFromCompareList",
+      "file": "packages/magento-compare/graphql/RemoveProductsFromCompareList.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 5,
+      "risk": "low"
+    },
+    {
+      "operation": "UpdateCustomerName",
+      "file": "packages/magento-customer/components/ChangeNameForm/UpdateCustomerName.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 5,
+      "risk": "low"
+    },
+    {
+      "operation": "PayPalPaymentPlaceOrder",
+      "file": "packages/magento-payment-paypal/components/PayPalPaymentPlaceOrder/PayPalPaymentPlaceOrder.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 5,
+      "risk": "low"
+    },
+    {
+      "operation": "ContentStages",
+      "file": "packages/hygraph-ui/plugins/HygraphPreviewModeToolbar.tsx",
+      "line": 19,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 5,
+      "risk": "low"
+    },
+    {
+      "operation": "VirtualProductPage",
+      "file": "packages/magento-product-virtual/VirtualProductPage.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 4,
+      "risk": "low"
+    },
+    {
+      "operation": "CmsBlocks",
+      "file": "packages/magento-cms/graphql/CmsBlocks.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 4,
+      "risk": "low"
+    },
+    {
+      "operation": "UpdateNewsletterSubscription",
+      "file": "packages/magento-newsletter/components/CustomerNewsletterToggle/UpdateNewsletterSubscription.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 4,
+      "risk": "low"
+    },
+    {
+      "operation": "ProductFilterTypes",
+      "file": "packages/magento-product/components/ProductListItems/ProductFilterTypes.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 4,
+      "risk": "low"
+    },
+    {
+      "operation": "MolliePaymentHandler",
+      "file": "packages/mollie-magento-payment/components/MolliePaymentHandler/MolliePaymentHandler.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 4,
+      "risk": "low"
+    },
+    {
+      "operation": "BlogPaths",
+      "file": "examples/magento-graphcms/components/Blog/BlogPaths.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "ConfirmCustomer",
+      "file": "packages/magento-customer/components/ConfirmCustomer/ConfirmCustomer.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "UpdateCustomerEmail",
+      "file": "packages/magento-customer/components/UpdateCustomerEmailForm/UpdateCustomerEmail.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "SubscribeCustomer",
+      "file": "packages/magento-newsletter/components/CheckoutNewsletter/SubscribeCustomer.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "MollieRecoverCart",
+      "file": "packages/mollie-magento-payment/components/MolliePaymentHandler/MollieRecoverCart.graphql",
+      "line": 1,
+      "depth": 3,
+      "nestedSelections": 2,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "CmsPage",
+      "file": "packages/magento-cms/graphql/CmsPage.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 10,
+      "risk": "low"
+    },
+    {
+      "operation": "CartAgreements",
+      "file": "packages/magento-cart/components/CartAgreementsForm/CartAgreements.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 8,
+      "risk": "low"
+    },
+    {
+      "operation": "HandleRedirect",
+      "file": "packages/magento-store/graphql/queries/HandleRedirect.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 8,
+      "risk": "low"
+    },
+    {
+      "operation": "CustomerToken",
+      "file": "packages/magento-customer/hooks/CustomerToken.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 6,
+      "risk": "low"
+    },
+    {
+      "operation": "AdyenPaymentDetails",
+      "file": "packages/magento-payment-adyen/components/AdyenPaymentHandler/AdyenPaymentDetails.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 5,
+      "risk": "low"
+    },
+    {
+      "operation": "AdyenPaymentStatus",
+      "file": "packages/magento-payment-adyen/components/AdyenPaymentHandler/AdyenPaymentStatus.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 5,
+      "risk": "low"
+    },
+    {
+      "operation": "CurrentCartId",
+      "file": "packages/magento-cart/hooks/CurrentCartId.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 4,
+      "risk": "low"
+    },
+    {
+      "operation": "CartFab",
+      "file": "packages/magento-cart/components/CartFab/CartFab.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 4,
+      "risk": "low"
+    },
+    {
+      "operation": "UpdateDefaultAddress",
+      "file": "packages/magento-customer/components/AccountAddresses/UpdateDefaultAddress.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 4,
+      "risk": "low"
+    },
+    {
+      "operation": "PostCodeNL",
+      "file": "packages/address-fields-nl/graphql/PostcodeNL.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "AlgoliaSendEvent",
+      "file": "packages/algolia-insights/graphql/AlgoliaSendEvent.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "PagesStaticPaths",
+      "file": "packages/hygraph-ui/graphql/PagesStaticPaths.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "CustomerCart",
+      "file": "packages/magento-cart/hooks/CustomerCart.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "MergeCarts",
+      "file": "packages/magento-cart/hooks/MergeCarts.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "CartEmail",
+      "file": "packages/magento-cart-email/EmailForm/CartEmail.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "CurrentCompareUid",
+      "file": "packages/magento-compare/graphql/CurrentCompareUid.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "CreateCustomerAddress",
+      "file": "packages/magento-customer/components/CreateCustomerAddressForm/CreateCustomerAddress.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "SignIn",
+      "file": "packages/magento-customer/components/SignInForm/SignIn.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "GetCustomerNewsletterToggle",
+      "file": "packages/magento-newsletter/components/CustomerNewsletterToggle/GetCustomerNewsLetterToggle.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "GetCartEmail",
+      "file": "packages/magento-newsletter/components/SignupNewsletter/GetCartEmail.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "AfterpayPaymentPlaceOrder",
+      "file": "packages/magento-payment-afterpay/components/AfterpayPaymentPlaceOrder/AfterpayPaymentPlaceOrder.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 3,
+      "risk": "low"
+    },
+    {
+      "operation": "UseCartRedirect",
+      "file": "packages/magento-cart/hooks/UseCartRedirect.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 2,
+      "risk": "low"
+    },
+    {
+      "operation": "AssignCompareListToCustomer",
+      "file": "packages/magento-compare/graphql/AssignCustomerToCompareList.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 2,
+      "risk": "low"
+    },
+    {
+      "operation": "DeleteCompareList",
+      "file": "packages/magento-compare/graphql/DeleteCompareList.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 2,
+      "risk": "low"
+    },
+    {
+      "operation": "IsEmailAvailable",
+      "file": "packages/magento-customer/hooks/IsEmailAvailable.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 2,
+      "risk": "low"
+    },
+    {
+      "operation": "UseCustomerValidateToken",
+      "file": "packages/magento-customer/hooks/UseCustomerValidateToken.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 2,
+      "risk": "low"
+    },
+    {
+      "operation": "BlogPostPaths",
+      "file": "examples/magento-graphcms/components/Blog/BlogPostPaths.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 2,
+      "risk": "low"
+    },
+    {
+      "operation": "BlogPostTaggedPaths",
+      "file": "examples/magento-graphcms/components/Blog/BlogPostTaggedPaths.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 2,
+      "risk": "low"
+    },
+    {
+      "operation": "RecaptchaV3Config",
+      "file": "packages/googlerecaptcha/graphql/query/RecaptchaV3Config.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 2,
+      "risk": "low"
+    },
+    {
+      "operation": "ContactUs",
+      "file": "packages/magento-customer/components/ContactForm/ContactUsMutation.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 2,
+      "risk": "low"
+    },
+    {
+      "operation": "SignOutForm",
+      "file": "packages/magento-customer/components/SignOutForm/SignOutForm.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 2,
+      "risk": "low"
+    },
+    {
+      "operation": "SubscribeGuest",
+      "file": "packages/magento-newsletter/components/CheckoutNewsletter/SubscribeGuest.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 2,
+      "risk": "low"
+    },
+    {
+      "operation": "GuestNewsletterToggle",
+      "file": "packages/magento-newsletter/components/GuestNewsletterToggle/GuestNewsletterToggle.graphql",
+      "line": 1,
+      "depth": 2,
+      "nestedSelections": 1,
+      "fieldCount": 2,
+      "risk": "low"
+    },
+    {
+      "operation": "CreateEmptyCart",
+      "file": "packages/magento-cart/hooks/CreateEmptyCart.graphql",
+      "line": 1,
+      "depth": 1,
+      "nestedSelections": 0,
+      "fieldCount": 1,
+      "risk": "low"
+    },
+    {
+      "operation": "UseBraintree",
+      "file": "packages/magento-payment-braintree/hooks/UseBraintree.graphql",
+      "line": 1,
+      "depth": 1,
+      "nestedSelections": 0,
+      "fieldCount": 1,
+      "risk": "low"
+    },
+    {
+      "operation": "DeleteCustomer",
+      "file": "packages/magento-customer/components/AccountDeleteForm/DeleteCustomer.graphql",
+      "line": 1,
+      "depth": 1,
+      "nestedSelections": 0,
+      "fieldCount": 1,
+      "risk": "low"
+    },
+    {
+      "operation": "DeleteCustomerAddressForm",
+      "file": "packages/magento-customer/components/DeleteCustomerAddressForm/DeleteCustomerAddressForm.graphql",
+      "line": 1,
+      "depth": 1,
+      "nestedSelections": 0,
+      "fieldCount": 1,
+      "risk": "low"
+    },
+    {
+      "operation": "ForgotPassword",
+      "file": "packages/magento-customer/components/ForgotPasswordForm/ForgotPassword.graphql",
+      "line": 1,
+      "depth": 1,
+      "nestedSelections": 0,
+      "fieldCount": 1,
+      "risk": "low"
+    },
+    {
+      "operation": "ResetPassword",
+      "file": "packages/magento-customer/components/ResetPasswordForm/ResetPassword.graphql",
+      "line": 1,
+      "depth": 1,
+      "nestedSelections": 0,
+      "fieldCount": 1,
+      "risk": "low"
+    },
+    {
+      "operation": "MSPPaymentHandler",
+      "file": "packages/magento-payment-multisafepay/components/MSPPaymentHandler/MSPPaymentHandler.graphql",
+      "line": 1,
+      "depth": 1,
+      "nestedSelections": 0,
+      "fieldCount": 1,
+      "risk": "low"
+    }
+  ],
+  "schemaDrift": [],
+  "unusedVariables": [
+    {
+      "operation": "ConfigurableProductPage",
+      "variables": [
+        "urlKey",
+        "useCustomAttributes"
+      ]
+    },
+    {
+      "operation": "VirtualProductPage",
+      "variables": [
+        "urlKey"
+      ]
+    },
+    {
+      "operation": "CategoryPage",
+      "variables": [
+        "url"
+      ]
+    },
+    {
+      "operation": "ProductPage2",
+      "variables": [
+        "reviewPageSize",
+        "reviewPage",
+        "useCustomAttributes"
+      ]
+    },
+    {
+      "operation": "CategoryPage",
+      "variables": [
+        "url"
+      ]
+    },
+    {
+      "operation": "ProductPage2",
+      "variables": [
+        "reviewPageSize",
+        "reviewPage",
+        "useCustomAttributes"
+      ]
+    },
+    {
+      "operation": "CategoryPage",
+      "variables": [
+        "url"
+      ]
+    },
+    {
+      "operation": "ProductPage2",
+      "variables": [
+        "reviewPageSize",
+        "reviewPage",
+        "useCustomAttributes"
+      ]
+    },
+    {
+      "operation": "SignUp",
+      "variables": [
+        "email",
+        "password",
+        "prefix",
+        "firstname",
+        "middlename",
+        "lastname",
+        "suffix",
+        "taxvat",
+        "gender",
+        "isSubscribed",
+        "dateOfBirth"
+      ]
+    },
+    {
+      "operation": "SignUpConfirm",
+      "variables": [
+        "email",
+        "password",
+        "prefix",
+        "firstname",
+        "middlename",
+        "lastname",
+        "suffix",
+        "taxvat",
+        "gender",
+        "isSubscribed",
+        "dateOfBirth"
+      ]
+    },
+    {
+      "operation": "AccountDashboardOrders",
+      "variables": [
+        "currentPage",
+        "pageSize"
+      ]
+    },
+    {
+      "operation": "GetConfigurableOptionsSelection",
+      "variables": [
+        "selectedOptions"
+      ]
+    },
+    {
+      "operation": "ProductReviewsPage",
+      "variables": [
+        "reviewPageSize",
+        "reviewPage"
+      ]
+    }
+  ]
+}

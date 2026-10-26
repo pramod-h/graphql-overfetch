@@ -168,10 +168,10 @@ jobs:
       - run: npx graphql-overfetch@latest --fail-on dead-queries,dead-fragments
 ```
 
-Overfetch detection is a heuristic (see
-[its limits](#how-overfetch-detection-works-and-its-limits)), so start by
-gating on the dead-code checks and add `overfetch` once your project reports
-cleanly.
+Start by gating on the checks your project already passes, so the gate only
+catches new problems. Overfetch findings can include deliberate cache-filling
+selections (see [its limits](#how-overfetch-detection-works-and-its-limits)),
+so review them before adding `overfetch` to the gate.
 
 ## What it understands
 
@@ -182,14 +182,20 @@ cleanly.
 | Apollo Client hooks (`useQuery`, `useMutation`, `useSuspenseQuery`, `useFragment`, …) | ✅ |
 | Apollo Client imperative API (`client.query({ query })`, `client.mutate({ mutation })`, incl. `.then()` chaining) | ✅ |
 | urql (`useQuery({ query })`, `useMutation`, imperative `client.query`) | ✅ |
-| graphql-request (`request(url, DOC)`) | ✅ |
+| graphql-request (`request(url, DOC)`, `client.request(DOC)`) | ✅ |
+| GraphQL Code Generator client-preset / gql.tada (`graphql(\`…\`)`) | ✅ |
+| Codegen static fetchers (`useFooQuery.fetcher(vars)()`) | ✅ |
+| Your own client function or wrapper hook called with a document (`gql(DOC, vars)`, `useCartQuery(DOC)`) | ✅ |
+| Operations maps (`operations.GET_FOO`, Venia `mergeOperations` keys) | ✅ |
+| GraphCommerce `@inject(into: [...])` fragments | ✅ |
 | Relay (`useLazyLoadQuery`, `useFragment`) | ✅ |
 | TypeScript **and** plain JS/JSX | ✅ |
 
 Field-read tracing handles optional chaining (`data?.a?.b`), destructuring
 (incl. renamed and nested defaults like `const { data: { user } = {} } = ...`),
-`.map()`/`.filter()`/`.reduce()` callbacks, `onCompleted`/`onData` callbacks,
-local re-aliasing, and pass-through (an object handed to a child component,
+`.map()`/`.filter()`/`.reduce()` callbacks (inline or same-file functions
+passed by name), `for…of` loops, `...rest`, `useMemo`, awaited and stored
+promises, `onCompleted`/`onData` callbacks, local re-aliasing, and pass-through (an object handed to a child component,
 returned from a custom hook, or spread into page props is treated as
 **used**, so custom-hook indirection and SSR prop drilling don't produce false
 positives).
@@ -248,11 +254,17 @@ This is a static heuristic. Where it can't see something, it errs toward *not*
 crying wolf — but be aware:
 
 - **Overfetch** doesn't follow reads through **React Context**
-  (`createContext`/`useContext`), Redux/global state, or a custom hook defined
-  in another file that isn't itself the `useQuery`/`client.query` call site.
-  It only traces the scope immediately around the query execution, plus
-  simple pass-through (return, JSX, spread, object literal) within that same
-  scope.
+  (`createContext`/`useContext`), Redux/zustand stores, or into another file
+  (a custom hook's caller, a mapper imported from elsewhere). Data handed to
+  any of those, spread into an object, or collected for `Promise.all` is
+  treated as fully used, so the tool stays silent rather than guessing. It
+  misses some real overfetch that way, but it doesn't report fields your app
+  needs.
+- **Mutations** are only analysed when every call site discards the result
+  (graphql-request / codegen fetchers).
+- **Cache-filling selections**: fields a query requests so *other*
+  components can read them from the Apollo cache (shared fragments) are
+  reported as unused. They are, for that query; check before removing.
 - **Dead queries** are detected by whether the document's identifier is
   referenced anywhere as a value (hook call, wrapper hook, operations-map,
   named import, generated hook). This handles custom-hook indirection and
