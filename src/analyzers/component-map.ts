@@ -1025,6 +1025,14 @@ export function mapComponents(
         collectAccesses(a, accessed, passthrough, queue);
       }
 
+      // The result goes somewhere we can't follow (Promise.all([...]), fn(useQuery(D)),
+      // return client.query(...)) → assume all of it is used, rather than letting
+      // this call site silently contribute no reads.
+      const handOff = resultHolder(call).getParent();
+      if (!hasResultAliases && handOff && WHOLE_OBJECT_PARENTS.has(handOff.getKind())) {
+        passthrough.add('');
+      }
+
       // `await request(...);` — the selection is fetched and dropped. Only for
       // clients without a normalized cache: with Apollo/urql/Relay a discarded
       // mutation result still updates the cache, so selecting fields can be deliberate.

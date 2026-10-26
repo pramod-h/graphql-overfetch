@@ -1150,3 +1150,27 @@ describe('PWA Studio follow-ups', () => {
     expect(findDuplicates(fragments)).toEqual([]); // `{ id }` stubs aren't duplicates
   });
 });
+
+describe('untraceable call sites', () => {
+  it('treats a result passed into Promise.all or returned as fully used', () => {
+    const { operations, fragments, usages, bindings } = analyze({
+      'q.ts': `
+        import { gql } from '@apollo/client';
+        export const SEARCH = gql\`query Search { products { total_count page_info { total_pages current_page } } }\`;
+      `,
+      'server.ts': `
+        import { SEARCH } from './q';
+        export async function load(client) {
+          const [res] = await Promise.all([client.query({ query: SEARCH })]);
+          return res;
+        }
+      `,
+      'Layout.tsx': `
+        import { useQuery } from '@apollo/client';
+        import { SEARCH } from './q';
+        export function Layout() { const { data } = useQuery(SEARCH); return data?.products?.total_count; }
+      `,
+    });
+    expect(analyzeOverfetch(operations, fragments, usages, bindings)).toEqual([]);
+  });
+});
