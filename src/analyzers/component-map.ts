@@ -8,6 +8,7 @@ import {
 import path from 'path';
 import { GraphQLOperation, GraphQLFragment, HookUsage, Library } from '../types';
 import { DocBinding } from '../parsers/graphql-files';
+import { importSources, PathAliases } from '../utils/imports';
 
 /** Hooks/functions that execute a GraphQL document, and the client they belong to. */
 const APOLLO_HOOKS = new Set([
@@ -82,12 +83,18 @@ export function buildResolvers(
   bindings: DocBinding[]
 ) {
   const opByVar = new Map<string, GraphQLOperation>();
+  const opsByVar = new Map<string, GraphQLOperation[]>();
+  const opAt = new Map<string, GraphQLOperation>();
   const opByName = new Map<string, GraphQLOperation>();
   const fragByVar = new Map<string, GraphQLFragment>();
   const fragByName = new Map<string, GraphQLFragment>();
 
   for (const op of operations) {
-    if (op.varName) opByVar.set(op.varName, op);
+    opAt.set(`${op.loc.file}:${op.loc.line}`, op);
+    if (op.varName) {
+      opByVar.set(op.varName, op);
+      opsByVar.set(op.varName, [...(opsByVar.get(op.varName) ?? []), op]);
+    }
     if (op.name) opByName.set(op.name.toLowerCase(), op);
   }
   for (const f of fragments) {
@@ -125,7 +132,23 @@ export function buildResolvers(
     return fragByName.get(identifier.toLowerCase()) ?? null;
   };
 
-  return { resolveOp, resolveFrag, opByName };
+  /** Like resolveOp, but when several files define the constant, prefer the one in `preferFile`. */
+  const resolveOpIn = (identifier: string | null, preferFile: string | null): GraphQLOperation | null => {
+    const candidates = identifier ? opsByVar.get(identifier) : undefined;
+    if (candidates && candidates.length > 1 && preferFile) {
+      const hit = candidates.find((o) => o.loc.file === preferFile);
+      if (hit) return hit;
+    }
+    return resolveOp(identifier);
+  };
+
+  /** The operation a usage executes: exactly, when it was resolved at mapping time. */
+  const resolveUsage = (u: HookUsage): GraphQLOperation | null =>
+    u.operationFile
+      ? opAt.get(`${u.operationFile}:${u.operationLine}`) ?? null
+      : resolveOp(u.documentIdentifier ?? u.operationName);
+
+  return { resolveOp, resolveOpIn, resolveUsage, resolveFrag, opByName, opsByVar };
 }
 
 interface Classified {
@@ -232,6 +255,8 @@ function enclosingComponent(node: Node, file: string): string {
 function docIdentifier(docArg: Node | null): string | null {
   if (!docArg) return null;
   if (Node.isIdentifier(docArg)) return docArg.getText();
+  // operations.GET_FOO (Venia-style operations objects, namespace imports)
+  if (Node.isPropertyAccessExpression(docArg)) return docArg.getName();
   // Tolerate `SomeDocument as DocumentNode` etc.
   if (Node.isAsExpression(docArg) && Node.isIdentifier(docArg.getExpression())) {
     return docArg.getExpression().getText();
@@ -693,21 +718,44 @@ function collectAccesses(
  * objects, or duplicate definitions that share a name. Declaration name nodes
  * are never in these positions, so an identifier here always means a reference.
  */
-export function collectReferencedNames(project: Project): Set<string> {
+export function collectReferencedNames(project: Project, aliases: PathAliases | null = null): Set<string> {
   const names = new Set<string>();
   const add = (t?: string | null) => {
     if (t) names.add(t);
   };
+  const files = new Set(project.getSourceFiles().map((s) => s.getFilePath()));
 
   for (const sf of project.getSourceFiles()) {
-    for (const imp of sf.getImportDeclarations()) {
-      for (const ni of imp.getNamedImports()) {
-        const name = ni.getNameNode().getText();
-        add(name);
-        const gen = GENERATED_HOOK_RE.exec(name);
-        if (gen) add(gen[1]); // import { useGetUserQuery } → GetUser
-      }
+    const file = sf.getFilePath();
+    const { named, namespaces } = importSources(sf, files, aliases);
+    // Qualified entries `NAME@/abs/file` record which file a name was imported
+    // from ('?' when unknown, or when that file only re-exports it), so dead-query
+    // detection can tell apart same-named constants defined in different files.
+    for (const [local, { imported, from }] of named) {
+      add(local);
+      add(imported);
+      const declares = from !== '?' && !!project.getSourceFile(from)?.getVariableDeclaration(imported);
+      add(`${imported}@${declares ? from : '?'}`);
+      const gen = GENERATED_HOOK_RE.exec(imported);
+      if (gen) add(gen[1]); // import { useGetUserQuery } → GetUser
     }
+    const addValue = (node: Node) => {
+      if (Node.isIdentifier(node)) {
+        const name = node.getText();
+        add(name);
+        // Declared here → this file. Neither declared nor imported (destructured,
+        // required, global) → unknown, which keeps every same-named copy alive.
+        const local = sf.getVariableDeclaration(name) || sf.getFunction(name);
+        add(`${name}@${local ? file : named.has(name) ? named.get(name)!.from : '?'}`);
+      } else if (Node.isPropertyAccessExpression(node)) {
+        // operations.GET_FOO / Queries.GET_FOO (namespace import)
+        add(node.getName());
+        const ns = namespaces.get(node.getExpression().getText());
+        add(`${node.getName()}@${ns ?? '?'}`);
+      } else if (Node.isTaggedTemplateExpression(node)) {
+        add(inlineDocName(node)); // client.query({ query: gql`query Foo …` })
+      }
+    };
     for (const call of sf.getDescendantsOfKind(SyntaxKind.CallExpression)) {
       const callee = call.getExpression();
       const hookName = Node.isIdentifier(callee)
@@ -718,27 +766,36 @@ export function collectReferencedNames(project: Project): Set<string> {
       const gen = GENERATED_HOOK_RE.exec(hookName);
       if (gen) add(gen[1]); // useGetUserQuery → GetUser
       for (const arg of call.getArguments()) {
-        if (Node.isIdentifier(arg)) add(arg.getText());
-        else if (Node.isObjectLiteralExpression(arg)) {
-          for (const p of arg.getProperties()) {
-            if (Node.isPropertyAssignment(p)) {
-              const init = p.getInitializer();
-              if (init && Node.isIdentifier(init)) add(init.getText());
-            }
-          }
-        } else {
-          // Inline documents: useLazyLoadQuery(graphql`query Foo…`) (Relay).
-          add(inlineDocName(arg));
-        }
+        if (Node.isObjectLiteralExpression(arg)) continue; // property values are covered below
+        // Inline documents too: useLazyLoadQuery(graphql`query Foo…`) (Relay).
+        addValue(arg);
       }
     }
-    // Operation-map objects: `{ getFooData: GET_FOO }` (Venia mergeOperations pattern).
+    // Object-literal values anywhere: `{ query: GET_FOO }`, operations maps
+    // `{ getFooData: GET_FOO }` (Venia mergeOperations), `export default { GET_FOO }`.
     for (const pa of sf.getDescendantsOfKind(SyntaxKind.PropertyAssignment)) {
       const init = pa.getInitializer();
-      if (init && Node.isIdentifier(init)) add(init.getText());
+      if (init) addValue(init);
+    }
+    for (const sp of sf.getDescendantsOfKind(SyntaxKind.ShorthandPropertyAssignment)) {
+      addValue(sp.getNameNode());
     }
   }
   return names;
+}
+
+/** Operations-map keys → the document constant they hold: `{ getFooQuery: GET_FOO }`. */
+function operationMapKeys(project: Project, opsByVar: Map<string, GraphQLOperation[]>): Map<string, string> {
+  const keys = new Map<string, string>();
+  for (const sf of project.getSourceFiles()) {
+    for (const pa of sf.getDescendantsOfKind(SyntaxKind.PropertyAssignment)) {
+      const init = pa.getInitializer();
+      if (init && Node.isIdentifier(init) && opsByVar.has(init.getText()) && !opsByVar.has(pa.getName())) {
+        keys.set(pa.getName(), init.getText());
+      }
+    }
+  }
+  return keys;
 }
 
 /**
@@ -768,13 +825,17 @@ export function mapComponents(
   project: Project,
   operations: GraphQLOperation[],
   fragments: GraphQLFragment[],
-  bindings: DocBinding[]
+  bindings: DocBinding[],
+  aliases: PathAliases | null = null
 ): HookUsage[] {
-  const { resolveOp, resolveFrag } = buildResolvers(operations, fragments, bindings);
+  const { resolveOp, resolveOpIn, resolveFrag, opsByVar } = buildResolvers(operations, fragments, bindings);
+  const mapKeys = operationMapKeys(project, opsByVar);
+  const files = new Set(project.getSourceFiles().map((s) => s.getFilePath()));
   const usages: HookUsage[] = [];
 
   for (const sf of project.getSourceFiles()) {
     const file = sf.getFilePath();
+    const { named, namespaces } = importSources(sf, files, aliases);
     for (const call of sf.getDescendantsOfKind(SyntaxKind.CallExpression)) {
       const classified = classifyCall(call);
       if (!classified) continue;
@@ -782,7 +843,18 @@ export function mapComponents(
 
       const identifier = generatedName ?? docIdentifier(docArg) ?? inlineDocName(docArg);
       const isFragmentHook = hook === 'useFragment';
-      const op = isFragmentHook ? null : resolveOp(identifier);
+      // Which file the document constant comes from, to pick between same-named ones.
+      const imported = identifier ? named.get(identifier) : undefined;
+      const nsFile =
+        docArg && Node.isPropertyAccessExpression(docArg)
+          ? namespaces.get(docArg.getExpression().getText())
+          : undefined;
+      const preferFile = nsFile ?? imported?.from ?? file;
+      const op = isFragmentHook
+        ? null
+        : resolveOpIn(identifier, preferFile) ??
+          resolveOpIn(imported?.imported ?? null, preferFile) ?? // import { GET_FOO as FOO }
+          resolveOp(identifier ? mapKeys.get(identifier) ?? null : null); // operations-map key
       const frag = isFragmentHook ? resolveFrag(identifier) : null;
 
       const operationName = op?.name ?? frag?.name ?? generatedName ?? identifier ?? null;
@@ -831,6 +903,7 @@ export function mapComponents(
         accessedPaths: Array.from(accessed),
         passthroughPaths: Array.from(passthrough),
         ...(resultDiscarded ? { resultDiscarded } : {}),
+        ...(op ? { operationFile: op.loc.file, operationLine: op.loc.line } : {}),
       });
     }
   }

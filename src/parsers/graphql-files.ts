@@ -88,9 +88,15 @@ export function extractTaggedTemplates(
       const before = defs.length;
       const parsed = extractDefinitions(text, 'tagged-template', file, startLine, errors);
 
-      const varName = tt
-        .getFirstAncestorByKind(SyntaxKind.VariableDeclaration)
-        ?.getName();
+      // Only `const FOO = gql`…`` binds the document to FOO — not an enclosing
+      // `const run = () => client.query({ query: gql`…` })`.
+      let holder: Node = tt;
+      while (Node.isAsExpression(holder.getParent()!) || Node.isParenthesizedExpression(holder.getParent()!)) {
+        holder = holder.getParent()!;
+      }
+      const decl = holder.getParent();
+      const varName =
+        decl && Node.isVariableDeclaration(decl) && decl.getInitializer() === holder ? decl.getName() : undefined;
       for (const p of parsed) p.varName = varName ?? null;
       defs.push(...parsed);
 

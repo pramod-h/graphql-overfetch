@@ -16,7 +16,21 @@ export function findDeadQueries(
   operations: GraphQLOperation[],
   referencedNames: Set<string>
 ): GraphQLOperation[] {
+  const varCount = new Map<string, number>();
+  for (const op of operations) {
+    if (op.varName) varCount.set(op.varName, (varCount.get(op.varName) ?? 0) + 1);
+  }
   return operations.filter((op) => {
+    // An inline anonymous document (`client.query({ query: gql`{ … }` })`) has
+    // nothing to look up; it sits where it runs, so don't call it dead.
+    if (!op.varName && !op.name) return false;
+    if (op.varName && (varCount.get(op.varName) ?? 0) > 1) {
+      // Several files define this constant: only references traced to this
+      // file count (or ones we couldn't trace, to stay on the safe side).
+      return !(
+        referencedNames.has(`${op.varName}@${op.loc.file}`) || referencedNames.has(`${op.varName}@?`)
+      );
+    }
     const ids = [op.varName, op.name, op.name ? `${op.name}Document` : null];
     return !ids.some((id) => id != null && referencedNames.has(id));
   });

@@ -24,11 +24,11 @@ export function analyzeUnrequestedReads(
   usages: HookUsage[],
   bindings: DocBinding[]
 ): UnrequestedReadFinding[] {
-  const { resolveOp } = buildResolvers(operations, fragments, bindings);
+  const { resolveUsage } = buildResolvers(operations, fragments, bindings);
   const findings: UnrequestedReadFinding[] = [];
   const byOp = new Map<GraphQLOperation, HookUsage[]>();
   for (const u of usages) {
-    const op = resolveOp(u.documentIdentifier ?? u.operationName);
+    const op = resolveUsage(u);
     if (!op) continue;
     if (!byOp.has(op)) byOp.set(op, []);
     byOp.get(op)!.push(u);

@@ -890,3 +890,70 @@ describe('tracer: data that travels further', () => {
     expect(f.unused.map((u) => u.path)).toContain('products.items.name');
   });
 });
+
+describe('resolving which operation runs', () => {
+  it('follows operations.X and export default { X } (Venia talons)', () => {
+    const { operations, fragments, usages, bindings, referencedNames } = analyze({
+      'addToCart.gql.ts': `
+        import { gql } from '@apollo/client';
+        export const ADD_ITEM = gql\`mutation AddItemToCart { addToCart { cart { id total } } }\`;
+        export const GET_SORT = gql\`query getCategorySortMethods { products { sort_fields { default options { label value } } } }\`;
+        export default { ADD_ITEM, getCategoryAvailableSortMethodsQuery: GET_SORT };
+      `,
+      'useTalon.ts': `
+        import { useMutation, useQuery } from '@apollo/client';
+        import DEFAULT_OPERATIONS from './addToCart.gql';
+        export const useTalon = (props) => {
+          const operations = { ...DEFAULT_OPERATIONS, ...props.operations };
+          const [add] = useMutation(operations.ADD_ITEM);
+          const { getCategoryAvailableSortMethodsQuery } = operations;
+          const { data } = useQuery(getCategoryAvailableSortMethodsQuery);
+          return [add, data?.products?.sort_fields?.options?.map((o) => o.label)];
+        };
+      `,
+    });
+    expect(findDeadQueries(operations, referencedNames).map((o) => o.name)).toEqual([]);
+    expect(usages.find((u) => u.hook === 'useMutation')?.operationName).toBe('AddItemToCart');
+    const sort = analyzeOverfetch(operations, fragments, usages, bindings).find(
+      (f) => f.operation === 'getCategorySortMethods'
+    )!;
+    expect(sort.unused.map((u) => u.path).sort()).toEqual([
+      'products.sort_fields.default',
+      'products.sort_fields.options.value',
+    ]);
+  });
+
+  it('counts inline gql passed to client.query as executed', () => {
+    const { operations, referencedNames } = analyze({
+      'cli.ts': `
+        import { gql } from '@apollo/client';
+        export const run = (client) => client.query({ query: gql\`query GetSchema { __schema { types { name } } }\` });
+        export const anon = (client) => client.query({ query: gql\`{ viewer { id } }\` });
+      `,
+    });
+    expect(findDeadQueries(operations, referencedNames)).toEqual([]);
+  });
+
+  it('tells apart same-named constants in different files, incl. tsconfig path aliases', () => {
+    const project = new Project({ useInMemoryFileSystem: true });
+    const files: Record<string, string> = {
+      '/src/graphql/payment.ts': `import { gql } from '@apollo/client';
+        export const RESET_CART = gql\`mutation resetCart { reset { ok } }\`;`,
+      '/src/graphql/checkout.ts': `import { gql } from '@apollo/client';
+        export const RESET_CART = gql\`mutation resetCart { reset { ok } }\`;
+        export const UNUSED = gql\`query Unused { a }\`;`,
+      '/src/Checkout.tsx': `import { useMutation } from '@apollo/client';
+        import { RESET_CART } from '@/graphql/checkout';
+        export function Checkout() { const [reset] = useMutation(RESET_CART); return reset; }`,
+    };
+    for (const [name, text] of Object.entries(files)) project.createSourceFile(name, text);
+    const { defs, bindings } = extractTaggedTemplates(project, []);
+    const { operations, fragments } = buildModel(defs);
+    const aliases = { baseDir: '/', paths: { '@/*': ['src/*'] } };
+    const referenced = collectReferencedNames(project, aliases);
+    const dead = findDeadQueries(operations, referenced).map((o) => `${o.name}@${o.loc.file}`);
+    expect(dead.sort()).toEqual(['Unused@/src/graphql/checkout.ts', 'resetCart@/src/graphql/payment.ts']);
+    const usages = mapComponents(project, operations, fragments, bindings, aliases);
+    expect(usages[0].operationFile).toBe('/src/graphql/checkout.ts');
+  });
+});

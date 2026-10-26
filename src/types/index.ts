@@ -94,6 +94,9 @@ export interface HookUsage {
    * normalized cache, so nothing can ever read the selected fields.
    */
   resultDiscarded?: boolean;
+  /** Where the executed operation is defined, when it was resolved. */
+  operationFile?: string;
+  operationLine?: number;
 }
 
 export type Confidence = 'high' | 'medium' | 'low';

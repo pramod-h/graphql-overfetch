@@ -17,6 +17,7 @@ import {
 import { runAnalysis } from '../analyzers';
 import { analyzeGeneratedTypes } from '../analyzers/generated-types';
 import { spinner } from '../utils/logger';
+import { loadPathAliases } from '../utils/imports';
 
 const SOURCE_IGNORE = DEFAULT_IGNORE.filter((g) => g !== '**/*.d.ts');
 
@@ -66,8 +67,9 @@ export function scan(options: ScanOptions): ScanResult {
   const { operations, fragments } = buildModel(allDefs);
 
   sp.text = 'Mapping components → operations…';
-  const usages = mapComponents(tsProject, operations, fragments, bindings);
-  const referencedNames = collectReferencedNames(tsProject);
+  const aliases = loadPathAliases(root);
+  const usages = mapComponents(tsProject, operations, fragments, bindings, aliases);
+  const referencedNames = collectReferencedNames(tsProject, aliases);
   const components = new Set(usages.map((u) => `${u.file}:${u.component}`)).size;
 
   sp.text = 'Running analyzers…';

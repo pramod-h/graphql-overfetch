@@ -48,12 +48,12 @@ export function analyzeOverfetch(
   cacheKeyFields: Set<string> = new Set()
 ): OverfetchFinding[] {
   const cacheKeys = new Set([...DEFAULT_CACHE_KEYS, ...cacheKeyFields]);
-  const { resolveOp } = buildResolvers(operations, fragments, bindings);
+  const { resolveUsage } = buildResolvers(operations, fragments, bindings);
 
   // Group usages by the operation they resolve to.
   const byOp = new Map<GraphQLOperation, HookUsage[]>();
   for (const u of usages) {
-    const op = resolveOp(u.documentIdentifier ?? u.operationName);
+    const op = resolveUsage(u);
     if (!op) continue;
     if (!byOp.has(op)) byOp.set(op, []);
     byOp.get(op)!.push(u);
