@@ -68,6 +68,8 @@ interface Alias {
   ident: string;
   /** Start the walk from this node instead of searching for `ident` (e.g. `useQuery(D).data`). */
   node?: Node;
+  /** The identifier that declares `ident`, so shadowing declarations can be told apart. */
+  declNode?: Node;
   /** Response-key path this identifier is rooted at ('' = operation root). */
   base: string;
   /** Scope to search for references (defaults to the enclosing function). */
@@ -299,13 +301,17 @@ function inlineDocName(docArg: Node | null): string | null {
  */
 function bindNamePattern(nameNode: Node, base: string, scope: Node, aliases: Alias[]): void {
   if (Node.isIdentifier(nameNode)) {
-    aliases.push({ ident: nameNode.getText(), base, scope });
+    aliases.push({ ident: nameNode.getText(), base, scope, declNode: nameNode });
     return;
   }
   if (Node.isObjectBindingPattern(nameNode)) {
     for (const el of nameNode.getElements()) {
-      if (el.getDotDotDotToken()) continue; // rest element — not a single field path
       const elNameNode = el.getNameNode();
+      if (el.getDotDotDotToken()) {
+        // const { __typename, ...rest } = obj → rest holds the remaining fields of obj
+        bindNamePattern(elNameNode, base, scope, aliases);
+        continue;
+      }
       const prop =
         el.getPropertyNameNode()?.getText() ??
         (Node.isIdentifier(elNameNode) ? elNameNode.getText() : undefined);
@@ -380,21 +386,36 @@ function resultAliases(
           const nn = first.getNameNode();
           if (Node.isObjectBindingPattern(nn)) pushObjData(nn);
           else if (Node.isIdentifier(nn)) {
-            aliases.push({ ident: nn.getText(), base: '', scope, viaData: true });
+            aliases.push({ ident: nn.getText(), base: '', scope, viaData: true, declNode: nn });
           }
         }
       } else {
-        // Apollo mutation: const [mutate, { data }] = useMutation(...)
+        // Apollo: const [mutate, { data }] = useMutation(...) / const [run, result] = useLazyQuery(...)
         const second = els[1];
-        if (second && Node.isBindingElement(second)) pushObjData(second.getNameNode());
+        if (second && Node.isBindingElement(second)) {
+          const nn = second.getNameNode();
+          if (Node.isIdentifier(nn)) aliases.push({ ident: nn.getText(), base: '', scope, viaData: true, declNode: nn });
+          else pushObjData(nn);
+        }
+        // The execute function resolves to the same result: const { data } = await run()
+        const first = els[0];
+        const exec = first && Node.isBindingElement(first) ? first.getNameNode() : undefined;
+        if (exec && Node.isIdentifier(exec)) {
+          for (const c of scope.getDescendantsOfKind(SyntaxKind.CallExpression)) {
+            const callee = c.getExpression();
+            if (Node.isIdentifier(callee) && callee.getText() === exec.getText()) {
+              aliases.push({ ident: '', node: resultHolder(c), base: '', scope, viaData: true });
+            }
+          }
+        }
       }
     } else if (Node.isIdentifier(nameNode)) {
       if (hook === 'useFragment' || library === 'relay') {
         // useFragment returns the data object directly.
-        aliases.push({ ident: nameNode.getText(), base: '', scope });
+        aliases.push({ ident: nameNode.getText(), base: '', scope, declNode: nameNode });
       } else {
         // const result = useQuery(...)  → result.data.<field>
-        aliases.push({ ident: nameNode.getText(), base: '', scope, viaData: true });
+        aliases.push({ ident: nameNode.getText(), base: '', scope, viaData: true, declNode: nameNode });
       }
     }
   }
@@ -491,21 +512,7 @@ function bindCallbackParams(
     : [params[0]];
 
   for (const p of elementParams) {
-    if (!p) continue;
-    const pn = p.getNameNode();
-    if (Node.isIdentifier(pn)) {
-      queue.push({ ident: pn.getText(), base, scope: body });
-    } else if (Node.isObjectBindingPattern(pn)) {
-      for (const el of pn.getElements()) {
-        if (el.getDotDotDotToken()) continue;
-        const elNameNode = el.getNameNode();
-        const prop =
-          el.getPropertyNameNode()?.getText() ??
-          (Node.isIdentifier(elNameNode) ? elNameNode.getText() : undefined);
-        if (prop === undefined) continue;
-        bindNamePattern(elNameNode, base ? `${base}.${prop}` : prop, body, queue);
-      }
-    }
+    if (p) bindNamePattern(p.getNameNode(), base, body, queue);
   }
   return true;
 }
@@ -534,6 +541,66 @@ const WHOLE_OBJECT_PARENTS = new Set([
   SyntaxKind.JsxSpreadAttribute,
 ]);
 
+/** Identifiers a binding name declares: `x`, or every name in `{ a, b: { c } }`. */
+function bindingIdentifiers(nameNode: Node): Node[] {
+  if (Node.isIdentifier(nameNode)) return [nameNode];
+  return nameNode
+    .getDescendantsOfKind(SyntaxKind.Identifier)
+    .filter((id) => {
+      const p = id.getParent();
+      return !!p && Node.isBindingElement(p) && p.getNameNode() === id;
+    });
+}
+
+/** The identifier `node` itself declares for `name` (params, `const`s, loop variables), if any. */
+function declarationIn(node: Node, name: string): Node | null {
+  const lists: Node[] = [];
+  if (
+    Node.isArrowFunction(node) ||
+    Node.isFunctionExpression(node) ||
+    Node.isFunctionDeclaration(node) ||
+    Node.isMethodDeclaration(node)
+  ) {
+    for (const p of node.getParameters()) lists.push(p.getNameNode());
+  } else if (Node.isBlock(node) || Node.isSourceFile(node) || Node.isCaseClause(node) || Node.isDefaultClause(node)) {
+    for (const st of node.getStatements()) {
+      if (Node.isVariableStatement(st)) {
+        for (const d of st.getDeclarations()) lists.push(d.getNameNode());
+      } else if (Node.isFunctionDeclaration(st) && st.getNameNode()) {
+        lists.push(st.getNameNode()!);
+      }
+    }
+  } else if (Node.isForOfStatement(node) || Node.isForInStatement(node) || Node.isForStatement(node)) {
+    const init = node.getInitializer();
+    if (init && Node.isVariableDeclarationList(init)) {
+      for (const d of init.getDeclarations()) lists.push(d.getNameNode());
+    }
+  } else if (Node.isCatchClause(node)) {
+    const v = node.getVariableDeclaration();
+    if (v) lists.push(v.getNameNode());
+  }
+  for (const n of lists) {
+    const hit = bindingIdentifiers(n).find((id) => id.getText() === name);
+    if (hit) return hit;
+  }
+  return null;
+}
+
+/**
+ * True when `ref` resolves to some other declaration of the same name between
+ * it and the alias's scope (an inner `const filters = {}` shadowing ours).
+ */
+function isShadowed(ref: Node, alias: Alias): boolean {
+  if (!alias.declNode) return false;
+  let n = ref.getParent();
+  while (n && n !== alias.scope) {
+    const decl = declarationIn(n, alias.ident);
+    if (decl) return decl !== alias.declNode;
+    n = n.getParent();
+  }
+  return false;
+}
+
 /**
  * Walk every reference to `alias.ident` within its scope, following member
  * chains, iteration callbacks, and re-aliasing, recording which response-key
@@ -550,7 +617,7 @@ function collectAccesses(
     ? [alias.node]
     : alias.scope
         .getDescendantsOfKind(SyntaxKind.Identifier)
-        .filter((id) => id.getText() === alias.ident);
+        .filter((id) => id.getText() === alias.ident && !isShadowed(id, alias));
 
   for (const ref of refs) {
     // Skip the declaration site itself.
@@ -659,7 +726,7 @@ function collectAccesses(
       if (endParent && Node.isVariableDeclaration(endParent) && endParent.getInitializer() === cur) {
         const bn = endParent.getNameNode();
         if (Node.isIdentifier(bn)) {
-          queue.push({ ident: bn.getText(), base: curPath, scope: alias.scope, viaData: true });
+          queue.push({ ident: bn.getText(), base: curPath, scope: alias.scope, viaData: true, declNode: bn });
         } else if (Node.isObjectBindingPattern(bn)) {
           for (const el of bn.getElements()) {
             const prop = el.getPropertyNameNode()?.getText() ?? el.getName();
@@ -672,20 +739,7 @@ function collectAccesses(
 
     // const x = <chain>  → re-alias
     if (endParent && Node.isVariableDeclaration(endParent) && endParent.getInitializer() === cur) {
-      const bn = endParent.getNameNode();
-      if (Node.isIdentifier(bn)) {
-        queue.push({ ident: bn.getText(), base: curPath, scope: alias.scope });
-      } else if (Node.isObjectBindingPattern(bn)) {
-        for (const el of bn.getElements()) {
-          if (el.getDotDotDotToken()) continue;
-          const elNameNode = el.getNameNode();
-          const prop =
-            el.getPropertyNameNode()?.getText() ??
-            (Node.isIdentifier(elNameNode) ? elNameNode.getText() : undefined);
-          if (prop === undefined) continue;
-          bindNamePattern(elNameNode, curPath ? `${curPath}.${prop}` : prop, alias.scope, queue);
-        }
-      }
+      bindNamePattern(endParent.getNameNode(), curPath, alias.scope, queue);
       if (curPath) accessed.add(curPath);
       continue;
     }
@@ -818,18 +872,35 @@ export function collectReferencedNames(project: Project, aliases: PathAliases | 
     for (const sp of sf.getDescendantsOfKind(SyntaxKind.ShorthandPropertyAssignment)) {
       addValue(sp.getNameNode());
     }
+    // .graphql files read at runtime/build time: readFileSync('../queries/foo.graphql')
+    for (const s of sf.getDescendantsOfKind(SyntaxKind.StringLiteral)) {
+      const m = /([\w.-]+\.(?:graphql|gql))$/.exec(s.getLiteralText());
+      if (m) add(`file:${m[1]}`);
+    }
   }
   return names;
 }
 
-/** Operations-map keys → the document constant they hold: `{ getFooQuery: GET_FOO }`. */
-function operationMapKeys(project: Project, opsByVar: Map<string, GraphQLOperation[]>): Map<string, string> {
-  const keys = new Map<string, string>();
+interface MapEntry {
+  /** The document constant the key holds. */
+  varName: string;
+  /** The file whose operations object declares the key. */
+  file: string;
+}
+
+/**
+ * Operations-map keys → where they're declared: `{ getFooQuery: GET_FOO }` in
+ * a `.gql.js` file (Venia). The same key often appears in many files, each
+ * talon importing its own map, so resolution must go through the imports.
+ */
+function operationMapKeys(project: Project, opsByVar: Map<string, GraphQLOperation[]>): Map<string, MapEntry[]> {
+  const keys = new Map<string, MapEntry[]>();
   for (const sf of project.getSourceFiles()) {
     for (const pa of sf.getDescendantsOfKind(SyntaxKind.PropertyAssignment)) {
       const init = pa.getInitializer();
       if (init && Node.isIdentifier(init) && opsByVar.has(init.getText()) && !opsByVar.has(pa.getName())) {
-        keys.set(pa.getName(), init.getText());
+        const entry = { varName: init.getText(), file: sf.getFilePath() };
+        keys.set(pa.getName(), [...(keys.get(pa.getName()) ?? []), entry]);
       }
     }
   }
@@ -837,8 +908,9 @@ function operationMapKeys(project: Project, opsByVar: Map<string, GraphQLOperati
 }
 
 /**
- * Field names the app's Apollo cache keys objects by: string entries of any
- * `keyFields: [...]` (typePolicies). Reported as unused, they'd break caching.
+ * Field names the app's Apollo cache needs: `keyFields: [...]` entries and
+ * fields read by typePolicies functions (`readField('x')`). Reported as
+ * unused, removing them would break caching.
  */
 export function collectCacheKeyFields(project: Project): Set<string> {
   const keys = new Set<string>();
@@ -848,6 +920,13 @@ export function collectCacheKeyFields(project: Project): Set<string> {
       const init = pa.getInitializer();
       if (!init || !Node.isArrayLiteralExpression(init)) continue;
       for (const s of init.getDescendantsOfKind(SyntaxKind.StringLiteral)) keys.add(s.getLiteralText());
+    }
+    // typePolicies read functions: readField('default_display_currency_code')
+    for (const call of sf.getDescendantsOfKind(SyntaxKind.CallExpression)) {
+      const callee = call.getExpression();
+      const name = Node.isPropertyAccessExpression(callee) ? callee.getName() : callee.getText();
+      const arg = call.getArguments()[0];
+      if (name === 'readField' && arg && Node.isStringLiteral(arg)) keys.add(arg.getLiteralText());
     }
   }
   return keys;
@@ -869,11 +948,36 @@ export function mapComponents(
   const { resolveOp, resolveOpIn, resolveFrag, opsByVar } = buildResolvers(operations, fragments, bindings);
   const mapKeys = operationMapKeys(project, opsByVar);
   const files = new Set(project.getSourceFiles().map((s) => s.getFilePath()));
+  const importsOf = new Map<string, ReturnType<typeof importSources>>();
+  const importsFor = (f: string) => {
+    if (!importsOf.has(f)) importsOf.set(f, importSources(project.getSourceFileOrThrow(f), files, aliases));
+    return importsOf.get(f)!;
+  };
+  /** A document constant as seen from `file`: defined there, or imported into it. */
+  const opVisibleIn = (varName: string, file: string): GraphQLOperation | null => {
+    const candidates = opsByVar.get(varName) ?? [];
+    const here = candidates.find((o) => o.loc.file === file);
+    if (here) return here;
+    const from = importsFor(file).named.get(varName)?.from;
+    const there = from ? candidates.find((o) => o.loc.file === from) : undefined;
+    return there ?? (candidates.length === 1 ? candidates[0] : null);
+  };
+  /** An operations-map key, through the operations objects this file imports. */
+  const resolveMapKey = (key: string, file: string): GraphQLOperation | null => {
+    const entries = mapKeys.get(key);
+    if (!entries) return null;
+    const { named, namespaces } = importsFor(file);
+    const visible = new Set([file, ...[...named.values()].map((i) => i.from), ...namespaces.values()]);
+    const hits = entries.filter((e) => visible.has(e.file));
+    const pick = hits.length ? hits : entries.length === 1 ? entries : [];
+    const ops = new Set(pick.map((e) => opVisibleIn(e.varName, e.file)).filter((o): o is GraphQLOperation => !!o));
+    return ops.size === 1 ? [...ops][0] : null; // ambiguous → don't guess
+  };
   const usages: HookUsage[] = [];
 
   for (const sf of project.getSourceFiles()) {
     const file = sf.getFilePath();
-    const { named, namespaces } = importSources(sf, files, aliases);
+    const { named, namespaces } = importsFor(file);
     for (const call of sf.getDescendantsOfKind(SyntaxKind.CallExpression)) {
       const classified = classifyCall(call);
       if (!classified) continue;
@@ -888,11 +992,13 @@ export function mapComponents(
           ? namespaces.get(docArg.getExpression().getText())
           : undefined;
       const preferFile = nsFile ?? imported?.from ?? file;
+      const isVar = !!identifier && opsByVar.has(identifier);
       const op = isFragmentHook
         ? null
-        : resolveOpIn(identifier, preferFile) ??
-          resolveOpIn(imported?.imported ?? null, preferFile) ?? // import { GET_FOO as FOO }
-          resolveOp(identifier ? mapKeys.get(identifier) ?? null : null); // operations-map key
+        : (isVar ? resolveOpIn(identifier, preferFile) : null) ??
+          (imported && imported.imported !== 'default' ? resolveOpIn(imported.imported, preferFile) : null) ?? // import { GET_FOO as FOO }
+          (identifier && mapKeys.has(identifier) ? resolveMapKey(identifier, file) : null) ?? // operations-map key
+          (identifier && !mapKeys.has(identifier) ? resolveOp(identifier) : null); // FooDocument, operation name
       const frag = isFragmentHook ? resolveFrag(identifier) : null;
 
       const operationName = op?.name ?? frag?.name ?? generatedName ?? identifier ?? null;

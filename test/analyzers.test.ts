@@ -6,7 +6,7 @@ import { spawnSync } from 'child_process';
 import { Project } from 'ts-morph';
 import { buildSchema } from 'graphql';
 import { extractTaggedTemplates } from '../src/parsers/graphql-files';
-import { buildModel } from '../src/parsers/operations';
+import { buildModel, extractDefinitions } from '../src/parsers/operations';
 import { mapComponents, collectReferencedNames, collectCacheKeyFields } from '../src/analyzers/component-map';
 import { analyzeOverfetch } from '../src/analyzers/overfetch';
 import { analyzeUnrequestedReads } from '../src/analyzers/unrequested-reads';
@@ -1057,5 +1057,96 @@ describe('GraphCommerce follow-ups', () => {
     });
     expect(findDeadFragments(operations, fragments, referencedNames)).toEqual([]);
     expect(findDuplicates(operations)).toEqual([]);
+  });
+});
+
+describe('PWA Studio follow-ups', () => {
+  it('resolves an operations-map key through the operations object the talon imports', () => {
+    const { operations, fragments, usages, bindings } = analyze({
+      'miniCart.gql.ts': `
+        import { gql } from '@apollo/client';
+        export const GET_STORE_CONFIG_DATA = gql\`query MiniCartConfig { storeConfig { store_code configurable_thumbnail_source } }\`;
+        export default { getStoreConfigQuery: GET_STORE_CONFIG_DATA };
+      `,
+      'product.gql.ts': `
+        import { gql } from '@apollo/client';
+        export const GET_STORE_CONFIG_DATA = gql\`query ProductConfig { storeConfig { store_code product_url_suffix } }\`;
+        export default { getStoreConfigQuery: GET_STORE_CONFIG_DATA };
+      `,
+      'useMiniCart.ts': `
+        import { useQuery } from '@apollo/client';
+        import DEFAULT_OPERATIONS from './miniCart.gql';
+        export const useMiniCart = (props) => {
+          const { getStoreConfigQuery } = { ...DEFAULT_OPERATIONS, ...props.operations };
+          const { data } = useQuery(getStoreConfigQuery);
+          return data?.storeConfig?.configurable_thumbnail_source;
+        };
+      `,
+    });
+    expect(usages[0].operationName).toBe('MiniCartConfig');
+    expect(analyzeUnrequestedReads(operations, fragments, usages, bindings)).toEqual([]);
+  });
+
+  it('follows ...rest elements, lazy-query results, and ignores shadowed names', () => {
+    const { operations, fragments, usages, bindings } = analyze({
+      'q.ts': `
+        import { gql } from '@apollo/client';
+        export const BILLING = gql\`query Billing { cart { billingAddress { firstName lastName city } } }\`;
+        export const ROUTE = gql\`query Route { route(url: $u) { type relative_url redirect_code } }\`;
+        export const FILTERS = gql\`query Filters { products { aggregations { label count } } }\`;
+      `,
+      'a.ts': `
+        import { useQuery, useLazyQuery } from '@apollo/client';
+        import { useMemo } from 'react';
+        import { BILLING, ROUTE, FILTERS } from './q';
+        const mapAddress = (a) => [a.firstName, a.lastName];
+        export const useBilling = () => {
+          const { data } = useQuery(BILLING);
+          const { __typename, ...raw } = data.cart.billingAddress;
+          return mapAddress(raw);
+        };
+        export const useRoute = () => {
+          const [run, queryResult] = useLazyQuery(ROUTE);
+          const { data } = queryResult;
+          const go = async () => { const { data: fresh } = await run(); return fresh.route.redirect_code; };
+          return [data?.route?.type, go];
+        };
+        export const useFilters = () => {
+          const { data: filterData } = useQuery(FILTERS);
+          const prices = useMemo(() => { const filters = {}; filters.price = 1; return filters; }, []);
+          const filters = filterData?.products?.aggregations;
+          return [prices, filters?.map((f) => f.label)];
+        };
+      `,
+    });
+    const findings = analyzeOverfetch(operations, fragments, usages, bindings);
+    const billing = findings.find((f) => f.operation === 'Billing');
+    expect(billing).toBeFalsy(); // raw → mapAddress counts as using the rest
+    const route = findings.find((f) => f.operation === 'Route')!;
+    expect(route.unused.map((u) => u.path)).toEqual(['route.relative_url']);
+    expect(analyzeUnrequestedReads(operations, fragments, usages, bindings)).toEqual([]);
+  });
+
+  it('unions same-named fragments, keeps readField fields, and .graphql files read by path', () => {
+    const project = new Project({ useInMemoryFileSystem: true });
+    project.createSourceFile('/gift.ts', `import { gql } from '@apollo/client';
+      export const CE = gql\`fragment GiftCardFragment on Cart { id }\`;`);
+    project.createSourceFile('/gift.ee.ts', `import { gql } from '@apollo/client';
+      export const EE = gql\`fragment GiftCardFragment on Cart { applied_gift_cards { code } }\`;`);
+    project.createSourceFile('/q.ts', `import { gql } from '@apollo/client';
+      export const CART = gql\`query Cart { cart { ...GiftCardFragment default_currency } }\`;`);
+    project.createSourceFile('/policies.ts', `export const p = { read(_, { readField }) { return readField('default_currency'); } };`);
+    project.createSourceFile('/build.ts', `const q = requireGraphQL('../queries/getStoreMediaUrl.graphql');`);
+    const { defs } = extractTaggedTemplates(project, []);
+    const { operations, fragments } = buildModel([
+      ...defs,
+      ...extractDefinitions('query getStoreMediaUrl { storeConfig { base_media_url } }', 'graphql-file', '/queries/getStoreMediaUrl.graphql', 0, []),
+    ]);
+    const cart = operations.find((o) => o.name === 'Cart')!;
+    expect(cart.leafPaths).toEqual(expect.arrayContaining(['cart.applied_gift_cards.code', 'cart.id']));
+    expect([...collectCacheKeyFields(project)]).toContain('default_currency');
+    // Cart is genuinely unused here; the .graphql file read by path is not dead.
+    expect(findDeadQueries(operations, collectReferencedNames(project)).map((o) => o.name)).toEqual(['Cart']);
+    expect(findDuplicates(fragments)).toEqual([]); // `{ id }` stubs aren't duplicates
   });
 });

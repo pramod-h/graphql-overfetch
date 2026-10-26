@@ -79,6 +79,8 @@ export function importSources(
       const imported = ni.getNameNode().getText();
       named.set((ni.getAliasNode() ?? ni.getNameNode()).getText(), { imported, from });
     }
+    const def = imp.getDefaultImport();
+    if (def) named.set(def.getText(), { imported: 'default', from });
     const ns = imp.getNamespaceImport();
     if (ns) namespaces.set(ns.getText(), from);
   }

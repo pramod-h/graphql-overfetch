@@ -15,8 +15,12 @@ interface Item {
   clientOnly: boolean;
 }
 
+/** `{ id __typename }` placeholders (e.g. edition stubs) aren't worth sharing. */
+const isStub = (d: GraphQLDocumentDef) =>
+  d.leafPaths.every((p) => /(^|\.)(id|uid|__typename)$/.test(p));
+
 function toItems(defs: GraphQLDocumentDef[]): Item[] {
-  return defs.map((d) => ({
+  return defs.filter((d) => !isStub(d)).map((d) => ({
     name: d.kind === 'operation' ? d.name ?? '(anonymous)' : d.name,
     file: d.loc.file,
     line: d.loc.line,

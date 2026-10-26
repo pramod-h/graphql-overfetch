@@ -142,7 +142,7 @@ function injectionMap(fragments: Iterable<FragmentDefinitionNode>): Map<string, 
 function walk(
   selectionSet: SelectionSetNode,
   parentPath: string,
-  fragments: Map<string, FragmentDefinitionNode>,
+  fragments: Map<string, FragmentDefinitionNode[]>,
   seenFragments: Set<string>,
   injected: Map<string, string[]> = new Map()
 ): FieldNode[] {
@@ -184,16 +184,20 @@ function walk(
 function expandFragment(
   fragName: string,
   parentPath: string,
-  fragments: Map<string, FragmentDefinitionNode>,
+  fragments: Map<string, FragmentDefinitionNode[]>,
   seenFragments: Set<string>,
   injected: Map<string, string[]>
 ): FieldNode[] {
-  const frag = fragments.get(fragName);
-  if (!frag || seenFragments.has(fragName)) return [];
+  // Several definitions can share a name (per-edition `.ee.js` / `.ce.js` files
+  // swapped at build time): request the union, since any of them may be live.
+  const defs = fragments.get(fragName);
+  if (!defs || seenFragments.has(fragName)) return [];
   const nextSeen = new Set(seenFragments).add(fragName);
   const out: FieldNode[] = [];
-  for (const node of walk(frag.selectionSet, parentPath, fragments, nextSeen, injected)) {
-    mergeField(out, node);
+  for (const frag of defs) {
+    for (const node of walk(frag.selectionSet, parentPath, fragments, nextSeen, injected)) {
+      mergeField(out, node);
+    }
   }
   for (const injector of injected.get(fragName) ?? []) {
     for (const node of expandFragment(injector, parentPath, fragments, nextSeen, injected)) {
@@ -243,14 +247,15 @@ export function buildModel(defs: ParsedDef[]): {
   operations: GraphQLOperation[];
   fragments: GraphQLFragment[];
 } {
-  const fragmentNodes = new Map<string, FragmentDefinitionNode>();
+  const fragmentNodes = new Map<string, FragmentDefinitionNode[]>();
   for (const d of defs) {
     if (d.node.kind === Kind.FRAGMENT_DEFINITION) {
-      fragmentNodes.set(d.node.name.value, d.node);
+      const name = d.node.name.value;
+      fragmentNodes.set(name, [...(fragmentNodes.get(name) ?? []), d.node]);
     }
   }
 
-  const injected = injectionMap(fragmentNodes.values());
+  const injected = injectionMap([...fragmentNodes.values()].flat());
 
   const operations: GraphQLOperation[] = [];
   const fragments: GraphQLFragment[] = [];

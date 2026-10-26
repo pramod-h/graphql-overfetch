@@ -1,3 +1,4 @@
+import path from 'path';
 import { GraphQLOperation } from '../types';
 
 /**
@@ -24,6 +25,8 @@ export function findDeadQueries(
     // An inline anonymous document (`client.query({ query: gql`{ … }` })`) has
     // nothing to look up; it sits where it runs, so don't call it dead.
     if (!op.varName && !op.name) return false;
+    // A .graphql file whose path appears in code is loaded as a string (fs.readFileSync).
+    if (op.source === 'graphql-file' && referencedNames.has(`file:${path.basename(op.loc.file)}`)) return false;
     if (op.varName && (varCount.get(op.varName) ?? 0) > 1) {
       // Several files define this constant: only references traced to this
       // file count (or ones we couldn't trace, to stay on the safe side).
