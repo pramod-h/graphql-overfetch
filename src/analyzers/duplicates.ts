@@ -9,6 +9,8 @@ interface Item {
   line: number;
   hash: string;
   scope: string;
+  /** Root field names (not aliases): near-duplicates must query the same fields. */
+  roots: string;
   leafPaths: string[];
 }
 
@@ -17,16 +19,19 @@ function toItems(defs: GraphQLDocumentDef[]): Item[] {
     name: d.kind === 'operation' ? d.name ?? '(anonymous)' : d.name,
     file: d.loc.file,
     line: d.loc.line,
-    hash: d.fieldSetHash,
+    hash: d.documentHash,
     scope: d.kind === 'operation' ? d.operation : d.typeCondition,
+    roots: Array.from(new Set(d.fields.map((f) => f.name))).sort().join(','),
     leafPaths: d.leafPaths,
   }));
 }
 
 /**
- * Group documents that request the same fields. Exact duplicates share a field
- * set hash (similarity 1.0); near-duplicates (same scope, Jaccard ≥ 0.9) are
- * reported too — that's the "SearchProducts vs ProductSearch, 98% identical".
+ * Group documents that request the same thing. Exact duplicates share a
+ * document hash: same fields, arguments and variables, whatever the operation
+ * name, aliases or field order (similarity 1.0). Near-duplicates (same scope
+ * and root fields, Jaccard ≥ 0.9 over response paths) are reported too —
+ * that's the "SearchProducts vs ProductSearch, 98% identical".
  */
 export function findDuplicates(defs: GraphQLDocumentDef[]): DuplicateGroup[] {
   const items = toItems(defs);
@@ -56,7 +61,7 @@ export function findDuplicates(defs: GraphQLDocumentDef[]): DuplicateGroup[] {
     const cluster = [rest[i]];
     for (let j = i + 1; j < rest.length; j++) {
       if (consumed.has(rest[j])) continue;
-      if (rest[i].scope !== rest[j].scope) continue;
+      if (rest[i].scope !== rest[j].scope || rest[i].roots !== rest[j].roots) continue;
       const sim = jaccard(rest[i].leafPaths, rest[j].leafPaths);
       if (sim >= NEAR_DUP_THRESHOLD && sim < 1) {
         cluster.push(rest[j]);

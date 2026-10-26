@@ -957,3 +957,21 @@ describe('resolving which operation runs', () => {
     expect(usages[0].operationFile).toBe('/src/graphql/checkout.ts');
   });
 });
+
+describe('duplicate detection', () => {
+  it('matches on fields, arguments and variables — not names, aliases, or order', () => {
+    const { operations } = analyze({
+      'q.ts': `
+        import { gql } from '@apollo/client';
+        export const A = gql\`mutation GenerateToken($email: String!, $otp: String!) { token(email: $email, otp: $otp) { value } }\`;
+        export const B = gql\`mutation generateToken($otp: String!, $email: String!) { token(otp: $otp, email: $email) { value } }\`;
+        export const ADD = gql\`mutation AddToCompare($ids: [ID!]) { compareList: addProductsToCompareList(ids: $ids) { uid items { sku } } }\`;
+        export const REMOVE = gql\`mutation RemoveFromCompare($ids: [ID!]) { compareList: removeProductsFromCompareList(ids: $ids) { uid items { sku } } }\`;
+        export const CARD1 = gql\`mutation SetCard($input: CardInput!) { setCard(input: $input) { ok } }\`;
+        export const CARD2 = gql\`mutation SetCardInline($n: String!) { setCard(input: { number: $n }) { ok } }\`;
+      `,
+    });
+    const groups = findDuplicates(operations).map((g) => g.members.map((m) => m.name).sort());
+    expect(groups).toEqual([['GenerateToken', 'generateToken']]);
+  });
+});

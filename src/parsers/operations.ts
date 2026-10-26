@@ -152,6 +152,9 @@ function walk(
       const responseKey = sel.alias?.value ?? sel.name.value;
       const path = parentPath ? `${parentPath}.${responseKey}` : responseKey;
       const hasSelection = !!sel.selectionSet;
+      const args = sel.arguments?.length
+        ? `(${sel.arguments.map((a) => `${a.name.value}:${print(a.value)}`).sort().join(',')})`
+        : '';
       const children = hasSelection
         ? walk(sel.selectionSet!, path, fragments, seenFragments, injected)
         : [];
@@ -160,6 +163,7 @@ function walk(
         responseKey,
         path,
         hasSelection,
+        args,
         children,
       });
     } else if (sel.kind === Kind.INLINE_FRAGMENT) {
@@ -211,6 +215,16 @@ function collectPaths(fields: FieldNode[]): { leaf: string[]; all: string[] } {
   };
   rec(fields);
   return { leaf, all };
+}
+
+/** Paths built from real field names + arguments (aliases ignored), for documentHash. */
+function signaturePaths(fields: FieldNode[], parent = ''): string[] {
+  const out: string[] = [];
+  for (const n of fields) {
+    const seg = `${parent}.${n.name}${n.args}`;
+    out.push(seg, ...signaturePaths(n.children, seg));
+  }
+  return out;
 }
 
 function treeDepth(fields: FieldNode[]): number {
@@ -265,6 +279,7 @@ export function buildModel(defs: ParsedDef[]): {
     if (d.node.kind === Kind.OPERATION_DEFINITION) {
       const op = d.node;
       const declared = (op.variableDefinitions ?? []).map((v) => v.variable.name.value);
+      const varDefs = (op.variableDefinitions ?? []).map((v) => print(v)).sort().join(',');
       const used = usedVariables(op.selectionSet);
       operations.push({
         kind: 'operation',
@@ -281,6 +296,7 @@ export function buildModel(defs: ParsedDef[]): {
         source: d.source,
         rawText,
         fieldSetHash: fieldSetHash(leaf, op.operation),
+        documentHash: fieldSetHash(signaturePaths(fields), `${op.operation}(${varDefs})`),
         varName: d.varName ?? null,
       });
     } else {
@@ -298,6 +314,7 @@ export function buildModel(defs: ParsedDef[]): {
         source: d.source,
         rawText,
         fieldSetHash: fieldSetHash(leaf, frag.typeCondition.name.value),
+        documentHash: fieldSetHash(signaturePaths(fields), `on ${frag.typeCondition.name.value}`),
         varName: d.varName ?? null,
       });
     }

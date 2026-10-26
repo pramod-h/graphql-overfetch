@@ -34,6 +34,8 @@ export interface FieldNode {
   path: string;
   /** True when the field has a sub-selection (object/list-of-object). */
   hasSelection: boolean;
+  /** Printed arguments, sorted by name: `(sku:$sku,pageSize:10)`; '' when none. */
+  args: string;
   children: FieldNode[];
 }
 
@@ -49,8 +51,14 @@ interface DocumentDefBase {
   loc: SourceLocation;
   source: DocSource;
   rawText: string;
-  /** Stable hash of the normalized field set — used for duplicate detection. */
+  /** Stable hash of the normalized field set (response keys) — used for near-duplicates. */
   fieldSetHash: string;
+  /**
+   * Hash of what the document actually asks for: real field names, their
+   * arguments, and the sorted variable definitions — ignoring the operation
+   * name, aliases and field order. Equal hashes = exact duplicates.
+   */
+  documentHash: string;
   /** JS/TS identifier this document was assigned to (`const FOO = gql\`\``). */
   varName: string | null;
 }
