@@ -36,7 +36,9 @@ export function findDeadFragments(
       reachable.add(name);
     }
   }
+  // With codegen's dedupeOperationSuffix, `FooFragment` generates type `FooFragment`.
+  const typeNames = (name: string) => (name.endsWith('Fragment') ? [name, `${name}Fragment`] : [`${name}Fragment`]);
   return fragments.filter(
-    (f) => !reachable.has(f.name) && !referencedNames.has(`${f.name}Fragment`)
+    (f) => !reachable.has(f.name) && !typeNames(f.name).some((t) => referencedNames.has(t))
   );
 }

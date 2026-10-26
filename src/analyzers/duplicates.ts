@@ -12,6 +12,7 @@ interface Item {
   /** Root field names (not aliases): near-duplicates must query the same fields. */
   roots: string;
   leafPaths: string[];
+  clientOnly: boolean;
 }
 
 function toItems(defs: GraphQLDocumentDef[]): Item[] {
@@ -22,6 +23,7 @@ function toItems(defs: GraphQLDocumentDef[]): Item[] {
     hash: d.documentHash,
     scope: d.kind === 'operation' ? d.operation : d.typeCondition,
     roots: Array.from(new Set(d.fields.map((f) => f.name))).sort().join(','),
+    clientOnly: /@client\b/.test(d.rawText),
     leafPaths: d.leafPaths,
   }));
 }
@@ -54,8 +56,10 @@ export function findDuplicates(defs: GraphQLDocumentDef[]): DuplicateGroup[] {
     }
   }
 
-  // Near-duplicates among the remainder, within the same scope.
-  const rest = items.filter((it) => !consumed.has(it));
+  // Near-duplicates among the remainder, within the same scope. Mutations that
+  // differ are different writes, and @client documents only read the local
+  // cache, so neither is a candidate for sharing.
+  const rest = items.filter((it) => !consumed.has(it) && it.scope !== 'mutation' && !it.clientOnly);
   for (let i = 0; i < rest.length; i++) {
     if (consumed.has(rest[i])) continue;
     const cluster = [rest[i]];

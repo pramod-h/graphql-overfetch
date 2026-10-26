@@ -1001,3 +1001,61 @@ describe('tracer: useMemo and arrow returns', () => {
     ]);
   });
 });
+
+describe('GraphCommerce follow-ups', () => {
+  const DOCS = `
+    import { gql } from '@apollo/client';
+    export const DASH = gql\`query AccountDashboard { customer { firstname orders { total_count } } }\`;
+    export const CUSTOMER = gql\`query Customer { customer { firstname } }\`;
+    export const PAGES = gql\`query HygraphAllPages { pages { url title metaRobots } }\`;
+  `;
+
+  it('uses the document passed to a custom wrapper hook named like a generated one', () => {
+    const { operations, fragments, usages, bindings } = analyze({
+      'q.ts': DOCS,
+      'Account.tsx': `
+        import { useCustomerQuery } from './hooks';
+        import { DASH } from './q';
+        export function Account() {
+          const dashboard = useCustomerQuery(DASH, { fetchPolicy: 'cache-and-network' });
+          return dashboard.data?.customer?.orders?.total_count;
+        }
+      `,
+    });
+    expect(usages[0].operationName).toBe('AccountDashboard');
+    expect(analyzeUnrequestedReads(operations, fragments, usages, bindings)).toEqual([]);
+  });
+
+  it('treats a whole result handed on before .data as fully used', () => {
+    const { operations, fragments, usages, bindings } = analyze({
+      'q.ts': DOCS,
+      'all.ts': `
+        import { PAGES } from './q';
+        export async function all(client) {
+          const query = client.query({ query: PAGES });
+          const pages = [query];
+          const { data } = await query;
+          if (data.pages.length > 1) pages.push(query);
+          return (await Promise.all(pages)).map((q) => q.data?.pages);
+        }
+      `,
+    });
+    expect(analyzeOverfetch(operations, fragments, usages, bindings)).toEqual([]);
+  });
+
+  it('recognises dedupeOperationSuffix type names and skips mutation / @client near-duplicates', () => {
+    const { operations, fragments, referencedNames } = analyze({
+      'q.ts': `
+        import { gql } from '@apollo/client';
+        export const PC = gql\`fragment PageContentQueryFragment on Query { pages { id } }\`;
+        export const PICKUP = gql\`mutation SetPickup($code: String!) { setShippingAddressesOnCart(input: { pickup_location_code: $code }) { cart { id email items { sku } note } } }\`;
+        export const SHIP = gql\`mutation SetShipping($a: AddressInput!) { setShippingAddressesOnCart(input: { address: $a }) { cart { id email items { sku } } } }\`;
+        export const GUEST = gql\`query WishGuest { customer @client { wishlists { id items { sku } note } } }\`;
+        export const CUST = gql\`query WishCustomer { customer { wishlists { id items { sku } } } }\`;
+      `,
+      'Row.tsx': `import type { PageContentQueryFragment } from './PageContent.gql'; export const x: PageContentQueryFragment | null = null;`,
+    });
+    expect(findDeadFragments(operations, fragments, referencedNames)).toEqual([]);
+    expect(findDuplicates(operations)).toEqual([]);
+  });
+});

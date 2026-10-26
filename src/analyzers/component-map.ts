@@ -206,6 +206,12 @@ function classifyCall(call: CallExpression): Classified | null {
   // Exclude known client hooks — Relay's useLazyLoadQuery/usePreloadedQuery
   // otherwise match this regex (use + "LazyLoad" + "Query") and get mislabeled.
   if (gen && !APOLLO_HOOKS.has(hook) && !URQL_HOOKS.has(hook) && !RELAY_HOOKS.has(hook)) {
+    // Generated hooks take options or variables. Given a document instead, it's
+    // a custom wrapper around useQuery (useCustomerQuery(AccountDocument)).
+    const first = args[0];
+    if (first && (Node.isIdentifier(first) || Node.isPropertyAccessExpression(first))) {
+      return { library: 'apollo', hook, docArg: first, generatedName: null };
+    }
     return { library: 'codegen', hook, docArg: null, generatedName: gen[1] };
   }
 
@@ -644,6 +650,12 @@ function collectAccesses(
     if (!sawData) {
       // The whole result moved to another variable before `.data` was read:
       // const r2 = await r  /  const { data } = await r
+      if (endParent && Node.isArrayLiteralExpression(endParent) && isDependencyArray(endParent)) continue;
+      if (endParent && WHOLE_OBJECT_PARENTS.has(endParent.getKind())) {
+        // The whole result handed on (return result, pages = [query], fn(result)).
+        passthrough.add(curPath);
+        continue;
+      }
       if (endParent && Node.isVariableDeclaration(endParent) && endParent.getInitializer() === cur) {
         const bn = endParent.getNameNode();
         if (Node.isIdentifier(bn)) {
